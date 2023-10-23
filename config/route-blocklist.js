@@ -1,5 +1,0 @@
-export default {
-    Administrador: [
-        'dashboard'
-    ]
-}
