@@ -1,6 +1,6 @@
 import './globals.css'
 import { Poppins } from 'next/font/google'
-import NextAuthSessionProvider from './providers/sessionProvider'
+import NextAuthSessionProvider from '@/app/src/providers/sessionProvider'
 
 const poppins = Poppins({ weight: ['500'], subsets: ['latin'] })
 

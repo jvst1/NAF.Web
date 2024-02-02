@@ -1,8 +1,8 @@
 'use client'
 
 import { useSession } from 'next-auth/react'
-import CommomNavbar from '../components/navbar';
-import AuthenticatedSidebar from '../components/sidebar';
+import CommomNavbar from '../../components/navbar';
+import AuthenticatedSidebar from '../../components/sidebar';
 import React from 'react'
 
 interface Props {

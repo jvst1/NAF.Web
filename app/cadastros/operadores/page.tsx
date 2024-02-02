@@ -1,20 +1,75 @@
 'use client'
 
-import { useSession } from "next-auth/react"
-import { useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { BreadcrumbItem, Breadcrumbs, useDisclosure } from "@nextui-org/react";
+import { getSession, useSession } from "next-auth/react";
+import { Operador } from "@/app/types";
+import TableOperadores from "./TableOperadores";
+import AddEditModal from "./AddEditModal";
 
-export default function Home() {
-    const { data: session, status } = useSession({
+export default function Operadores() {
+    const { data: session } = useSession({
         required: true
     })
 
-    if (status === "loading") {
-        return <></>
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
+    const [item, setItem] = useState<Operador>();
+    const [items, setItems] = useState<Operador[]>([]);
+    const [refreshKey, setRefreshKey] = useState(0);
+
+    function refresh() {
+        setRefreshKey(oldKey => oldKey + 1)
+    }
+
+    useEffect(() => {
+        const getData = async () => {
+            const ses = await getSession()
+
+            const query = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Operador`, {
+                headers: {
+                    authorization: `Bearer ${ses?.user.token}`,
+                    'Content-Type': 'application/json',
+                }
+            })
+
+            const response = await query.json()
+            setItems(response)
+        }
+        getData()
+    }, [refreshKey])
+
+    function openEditModal(item: Operador) {
+        setItem(item)
+        onOpen()
+    }
+
+    function openAddModal() {
+        var operador: Operador = {
+            nome: "",
+            identificador: "",
+            documento: "",
+            email: "",
+            telefoneCelular: "",
+            tipoPerfil: 1,
+            situacao: 1
+        }
+        setItem(operador)
+        onOpen()
     }
 
     return (
-        <main className="h-screen flex justify-center items-center">
-            <h1>Board</h1>
-        </main>
-    )
+        <>
+            <div className="p-2 h-5/6">
+                <Breadcrumbs className="py-2">
+                    <BreadcrumbItem size="lg">Cadastros</BreadcrumbItem>
+                    <BreadcrumbItem size="lg">Operadores</BreadcrumbItem>
+                </Breadcrumbs>
+
+                <TableOperadores refresh={refresh} items={items} openEditModal={openEditModal} openAddModal={openAddModal}></TableOperadores>
+            </div>
+
+            <AddEditModal isOpen={isOpen} onOpenChange={onOpenChange} refresh={refresh} item={item}></AddEditModal>
+        </>
+    );
 }

@@ -25,34 +25,14 @@ export default function AuthenticatedSidebar({ children }: Props) {
           <p className='text-3xl font-bold mb-4'>NAF</p>
           <Link href="/dashboard" className={(pathname === '/dashboard' ? 'bg-gray-200 ' : '') + 'w-full p-4 hover:bg-gray-200 transition'}>Dashboard</Link>
           <Link href="/board" className={(pathname === '/board' ? 'bg-gray-200 ' : '') + 'w-full p-4 hover:bg-gray-200 transition'}>Board</Link>
+          <Link href="/cadastros/operadores" className={(pathname === '/cadastros/operadores' ? 'bg-gray-200 ' : '') + 'w-full p-4 hover:bg-gray-200 transition'}>Cadastro de Operadores</Link>
+          <Link href="/cadastros/area" className={(pathname === '/cadastros/area' ? 'bg-gray-200 ' : '') + 'w-full p-4 hover:bg-gray-200 transition'}>Cadastro de Área</Link>
           <Link href="/cadastros/servicos" className={(pathname === '/cadastros/servicos' ? 'bg-gray-200 ' : '') + 'w-full p-4 hover:bg-gray-200 transition'}>Cadastro de Serviços</Link>
+          <Link href="/cadastros/perguntas-faq" className={(pathname === '/cadastros/perguntas-faq' ? 'bg-gray-200 ' : '') + 'w-full p-4 hover:bg-gray-200 transition'}>Cadastro de FAQ</Link>
         </div>
         <Button className='mb-8' onClick={logout} color="danger">Sair</Button>
       </div>
       <div className='col-span-10'>
-        <header className='flex justify-between items-center py-4'>
-          <Input
-            classNames={{
-              base: "max-w-full sm:max-w-[18rem] h-10",
-              mainWrapper: "h-full",
-              input: "text-small",
-              inputWrapper: "h-full font-normal text-default-500 bg-default-400/20 dark:bg-default-500/20",
-            }}
-            placeholder="Pesquisar"
-            size="lg"
-            startContent={<SearchIcon />}
-            type="search"
-          />
-          <Avatar
-            isBordered
-            as="button"
-            className="transition-transform mr-4"
-            color="secondary"
-            name="Jason Hughes"
-            size="sm"
-            src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
-          />
-        </header>
         {children}
       </div>
     </div>

@@ -1,76 +1,87 @@
 'use client'
 
-import React from "react";
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, User, Chip, Tooltip, ChipProps, getKeyValue } from "@nextui-org/react";
-import { EditIcon } from "@/app/assets/icons/EditIcon";
-import { DeleteIcon } from "@/app/assets/icons/DeleteIcon";
-import { columns, users } from "./data";
-import { useSession } from "next-auth/react";
+import React, { useEffect, useState } from "react";
+import { BreadcrumbItem, Breadcrumbs, useDisclosure } from "@nextui-org/react";
+import { getSession, useSession } from "next-auth/react";
+import { Area, Servico } from "@/app/types";
+import TableServicos from "./TableServicos";
+import AddEditModal from "./AddEditModal";
 
-type User = typeof users[0];
-
-export default function CadastroServicos() {
-    const { data: session, status } = useSession({
+export default function Servicos() {
+    const { data: session } = useSession({
         required: true
     })
 
-    const renderCell = React.useCallback((user: User, columnKey: React.Key) => {
-        const cellValue = user[columnKey as keyof User];
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-        switch (columnKey) {
-            case "name":
-                return (
-                    <User
-                        avatarProps={{ radius: "lg", src: user.avatar }}
-                        description={user.email}
-                        name={cellValue}
-                    >
-                        {user.email}
-                    </User>
-                );
-            case "role":
-                return (
-                    <div className="flex flex-col">
-                        <p className="text-bold text-sm capitalize">{cellValue}</p>
-                        <p className="text-bold text-sm capitalize text-default-400">{user.team}</p>
-                    </div>
-                );
-            case "actions":
-                return (
-                    <div className="relative flex items-center gap-2">
-                        <Tooltip content="Edit user">
-                            <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                                <EditIcon />
-                            </span>
-                        </Tooltip>
-                        <Tooltip color="danger" content="Delete user">
-                            <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                                <DeleteIcon />
-                            </span>
-                        </Tooltip>
-                    </div>
-                );
-            default:
-                return cellValue;
+    const [item, setItem] = useState<Servico>();
+    const [items, setItems] = useState<Servico[]>([]);
+    const [areas, setAreas] = useState<Area[]>([]);
+    const [refreshKey, setRefreshKey] = useState(0);
+
+    function refresh() {
+        setRefreshKey(oldKey => oldKey + 1)
+    }
+
+    useEffect(() => {
+        const getData = async () => {
+            const ses = await getSession()
+
+            const query = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Servico`, {
+                headers: {
+                    authorization: `Bearer ${ses?.user.token}`,
+                    'Content-Type': 'application/json',
+                }
+            })
+
+            const response = await query.json()
+            setItems(response)
         }
-    }, []);
+        getData()
+    }, [refreshKey])
+
+    const getAreas = async () => {
+        const query = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Area`, {
+            headers: {
+                authorization: `Bearer ${session?.user.token}`,
+                'Content-Type': 'application/json',
+            }
+        })
+
+        const response = await query.json()
+
+        setAreas(response)
+    }
+
+    function openEditModal(item: Servico) {
+        // getAreas()
+        setItem(item)
+        onOpen()
+    }
+
+    function openAddModal() {
+        var servico: Servico = {
+            nome: "",
+            descricao: "",
+            area: ""
+        }
+        // getAreas()
+        setItem(servico)
+        onOpen()
+    }
 
     return (
-        <Table>
-            <TableHeader columns={columns}>
-                {(column: any) => (
-                    <TableColumn key={column.uid} align={column.uid === "actions" ? "center" : "start"}>
-                        {column.name}
-                    </TableColumn>
-                )}
-            </TableHeader>
-            <TableBody items={users}>
-                {(item: any) => (
-                    <TableRow key={item.id}>
-                        {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
-                    </TableRow>
-                )}
-            </TableBody>
-        </Table>
+        <>
+            <div className="p-2 h-5/6">
+                <Breadcrumbs className="py-2">
+                    <BreadcrumbItem size="lg">Cadastros</BreadcrumbItem>
+                    <BreadcrumbItem size="lg">Serviços</BreadcrumbItem>
+                </Breadcrumbs>
+
+                <TableServicos refresh={refresh} items={items} openEditModal={openEditModal} openAddModal={openAddModal}></TableServicos>
+            </div>
+
+            <AddEditModal isOpen={isOpen} onOpenChange={onOpenChange} refresh={refresh} item={item} areas={areas}></AddEditModal>
+        </>
     );
 }
