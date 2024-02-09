@@ -46,6 +46,7 @@ export default function Area() {
 
     function openAddModal() {
         var servico: Area = {
+            codigo: "",
             nome: ""
             
         }

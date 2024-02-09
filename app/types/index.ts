@@ -1,15 +1,19 @@
 export interface Servico {
+    codigo: string,
+    codigoArea: string,
     area: string,
     nome: string,
     descricao: string
 }
 
 export interface PerguntaFrequente {
+    codigo: string,
     pergunta: string,
     resposta: string
 }
 
 export interface Area {
+    codigo: string,
     nome: string
 }
 
