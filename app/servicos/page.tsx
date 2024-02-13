@@ -1,50 +1,73 @@
 'use client'
 
-import { Card, CardBody } from "@nextui-org/react";
+import React, { useState, useEffect } from 'react';
+import { Card, CardBody } from '@nextui-org/react';
+import { Area, Servico } from "@/app/types";
 
 export default function Home() {
-    function selectCard (e: any, cardid: number) {
-        console.log(cardid)
-    }
+    const [areas, setAreas] = useState<Area[]>([]);
+    const [services, setServices] = useState<Servico[]>([]);
+    const [selectedService, setSelectedService] = useState<Servico | null>(null);
+    const [openArea, setOpenArea] = useState<string | null>(null);
+
+    useEffect(() => {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/Area`)
+            .then(response => response.json())
+            .then(data => setAreas(data))
+            .catch(error => console.error("Failed to fetch areas:", error));
+
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/Servico`)
+            .then(response => response.json())
+            .then(data => setServices(data))
+            .catch(error => console.error("Failed to fetch services:", error));
+    }, []);
+
+    const toggleArea = (codigo: string) => {
+        if (openArea === codigo) {
+            setOpenArea(null);
+        } else {
+            setOpenArea(codigo);
+        }
+    };
+
+    const servicesCountByArea = services.reduce<Record<string, number>>((acc, service) => {
+        acc[service.codigoArea] = (acc[service.codigoArea] || 0) + 1;
+        return acc;
+    }, {});
+
+    const filteredAreas = areas.filter(area => servicesCountByArea[area.codigo] > 1);
 
     return (
-        <div className="h-5/6 flex justify-evenly items-center py-4">
-            <div className="w-3/4 flex flex-wrap justify-center items-center gap-12">
-                <Card isPressable className="bg-gray-200 w-72 h-32" onPress={(e) => {selectCard(e, 1)}}>
-                    <CardBody className="flex justify-center text-center">
-                        <p>Cadastro de Imóveis Rurais</p>
-                    </CardBody>
-                </Card>
-                <Card className="bg-gray-200 w-72 h-32">
-                    <CardBody className="flex justify-center text-center">
-                        <p>Cadastro de Pessoas Físicas</p>
-                    </CardBody>
-                </Card>
-                <Card className="bg-gray-200 w-72 h-32">
-                    <CardBody className="flex justify-center text-center">
-                        <p>Certificado Digital</p>
-                    </CardBody>
-                </Card>
-                <Card className="bg-gray-200 w-72 h-32">
-                    <CardBody className="flex justify-center text-center">
-                        <p>Declaração do Imposto sobre a Renda da Pessoa Física</p>
-                    </CardBody>
-                </Card>
-                <Card className="bg-gray-200 w-72 h-32">
-                    <CardBody className="flex justify-center text-center">
-                        <p>Habilitação para utilizar o Siscomex</p>
-                    </CardBody>
-                </Card>
-                <Card className="bg-gray-200 w-72 h-32">
-                    <CardBody className="flex justify-center text-center">
-                        <p>Isenção do IPI/IOF - Aquisição de Veículo para Deficiente e Autista</p>
-                    </CardBody>
-                </Card>
-                <Card className="bg-gray-200 w-72 h-32">
-                    <CardBody className="flex justify-center text-center">
-                        <p>Microempreendedor Individual</p>
-                    </CardBody>
-                </Card>
+        <div className="flex">
+            <div className="w-64 h-screen overflow-y-auto fixed bg-gray-100 p-4">
+                {filteredAreas.map(area => (
+                    <div key={area.codigo}>
+                        <div className="cursor-pointer p-2 hover:bg-gray-200 font-bold" onClick={() => toggleArea(area.codigo)}>
+                            {area.nome}
+                        </div>
+                        {openArea === area.codigo && (
+                            <ul className="list-disc pl-4">
+                                {services.filter(service => service.codigoArea === area.codigo).map(service => (
+                                    <li key={service.codigo} className="cursor-pointer p-2 hover:bg-gray-200" onClick={() => setSelectedService(service)}>
+                                        {service.nome}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
+                ))}
+            </div>
+            <div className="ml-64 flex-1 p-4">
+                {selectedService ? (
+                    <Card className="bg-gray-200 shadow rounded">
+                        <CardBody>
+                            <h1 className="text-lg font-bold">{selectedService.nome}</h1>
+                            <p>{selectedService.descricao}</p>
+                        </CardBody>
+                    </Card>
+                ) : (
+                    <p className="text-center">Selecione um serviço para conhecer mais!</p>
+                )}
             </div>
         </div>
     )

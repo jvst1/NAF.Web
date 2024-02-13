@@ -46,6 +46,7 @@ export default function Atletas() {
 
     function openAddModal() {
         var servico: PerguntaFrequente = {
+            codigo: "",
             pergunta: "",
             resposta: ""
         }
