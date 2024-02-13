@@ -38,12 +38,12 @@ export default function CommomNavbar({ children }: Props) {
 
     let { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-    const userName = useRef("")
+    const document = useRef("")
     const password = useRef("")
 
     async function login() {
         const result = await signIn("credentials", {
-            userName: userName.current,
+            document: document.current,
             password: password.current,
             redirect: true,
             callbackUrl: "/dashboard"
@@ -66,9 +66,9 @@ export default function CommomNavbar({ children }: Props) {
                             <ModalBody>
                                 <Input
                                     autoFocus
-                                    label="Usuário"
+                                    label="Documento Federal"
                                     variant="bordered"
-                                    onChange={(e) => (userName.current = e.target.value)}
+                                    onChange={(e) => (document.current = e.target.value)}
                                 />
                                 <Input
                                     label="Senha"

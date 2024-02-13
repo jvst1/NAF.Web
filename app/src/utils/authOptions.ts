@@ -6,17 +6,34 @@ export const authOptions: NextAuthOptions = {
         Credentials({
             name: "Credentials",
             credentials: {
-                userName: { label: "Email", type: "text" },
+                document: { label: "Documento Federal", type: "text" },
                 password: { label: "Password", type: "password" }
             },
-            authorize(credentials, req) {
-                if (credentials?.userName === "admin" && credentials?.password === "admin") {
-                    return {
-                        id: "1",
-                        name: "Admin",
-                        token: "uadafiddle",
-                        email: "admin@gmail.com"
+            async authorize(credentials: any, req: any) {
+                const request = {
+                    documentoFederal: credentials?.document,
+                    password: credentials?.password
+                }
+
+                var res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Auth/login`, {
+                    method: 'POST',
+                    body: JSON.stringify(request),
+                    headers: {
+                        'Content-Type': 'application/json'
                     }
+                })
+
+                const data = await res.json()
+
+                if (res.ok && data) {
+                    return {
+                        id: data.codigoUsuario,
+                        nome: data.email,
+                        token: data.token,
+                        tipoPerfil: data.tipoPerfil
+                    }
+                } else {
+                    throw Error(data.mensagem)
                 }
 
                 return null
