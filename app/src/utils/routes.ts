@@ -1,7 +1,8 @@
 enum TipoUsuario {
-    Comunidade = 0,
-    Aluno = 1,
-    Professor = 2
+    Nenhum = 0,
+    Comunidade = 1,
+    Aluno = 2,
+    Professor = 3
 }
 
 export interface Routes {
@@ -14,13 +15,12 @@ export interface Routes {
 export const routes: Routes[] = [
     { name: "Dashboard", route: "/dashboard", allRoles: true, roles: [] },
     { name: "Board", route: "/board", allRoles: false, roles: [TipoUsuario.Aluno, TipoUsuario.Professor] },
-    { name: "Jogar pela Atlética", route: "/cadastros/operadores", allRoles: false, roles: [TipoUsuario.Professor] },
-    { name: "Atleticas", route: "/cadastros/area", allRoles: false, roles: [TipoUsuario.Professor] },
-    { name: "Usuários", route: "/cadastros/servicos", allRoles: false, roles: [TipoUsuario.Professor] }
+    { name: "Usuários", route: "/cadastros/operadores", allRoles: false, roles: [TipoUsuario.Professor] },
+    { name: "Área", route: "/cadastros/area", allRoles: false, roles: [TipoUsuario.Professor] },
+    { name: "Serviços", route: "/cadastros/servicos", allRoles: false, roles: [TipoUsuario.Professor] },
+    { name: "Perguntas Frequêntes", route: "/cadastros/perguntas-faq", allRoles: false, roles: [TipoUsuario.Professor] }
 ]
 
-export function getUserRoutes(tipoUsuario: any): Routes[] {
-    return routes
-
-    // .filter(route => route.allRoles || route.roles.includes(tipoUsuario))
+export function getUserRoutes(tipoPerfil: any): Routes[] {
+    return routes.filter(route => route.allRoles || route.roles.includes(tipoPerfil))
 }

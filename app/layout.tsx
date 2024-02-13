@@ -1,5 +1,7 @@
 import './globals.css'
+import 'react-toastify/dist/ReactToastify.css';
 import { Poppins } from 'next/font/google'
+import { ToastContainer } from 'react-toastify';
 import NextAuthSessionProvider from '@/app/src/providers/sessionProvider'
 
 const poppins = Poppins({ weight: ['500'], subsets: ['latin'] })
@@ -15,6 +17,8 @@ export default function RootLayout({
         <NextAuthSessionProvider>
           {children}
         </NextAuthSessionProvider>
+
+        <ToastContainer />
       </body>
     </html>
   )

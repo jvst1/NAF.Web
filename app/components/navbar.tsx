@@ -9,19 +9,13 @@ import {
     Button,
     NavbarMenu,
     NavbarMenuItem,
-    Modal,
-    ModalContent,
-    ModalHeader,
-    ModalBody,
-    ModalFooter,
-    useDisclosure,
-    Input
+    useDisclosure
 } from "@nextui-org/react";
-import { signIn } from "next-auth/react";
 
 
 import Link from "next/link";
-import { useRef } from "react";
+import LoginModal from "./loginModal";
+import RegisterModal from "./registerModal";
 
 interface Props {
     children?: React.ReactNode
@@ -37,59 +31,10 @@ export default function CommomNavbar({ children }: Props) {
     ];
 
     let { isOpen, onOpen, onOpenChange } = useDisclosure();
-
-    const document = useRef("")
-    const password = useRef("")
-
-    async function login() {
-        const result = await signIn("credentials", {
-            document: document.current,
-            password: password.current,
-            redirect: true,
-            callbackUrl: "/dashboard"
-        })
-
-        isOpen = false
-    }
+    const { isOpen: isOpenRegister, onOpen: onOpenRegister, onOpenChange: onOpenRegisterChange } = useDisclosure();
 
     return (
         <div className="h-screen">
-            <Modal
-                isOpen={isOpen}
-                onOpenChange={onOpenChange}
-                placement="top-center"
-            >
-                <ModalContent>
-                    {(onClose) => (
-                        <>
-                            <ModalHeader className="flex flex-col gap-1">Entrar</ModalHeader>
-                            <ModalBody>
-                                <Input
-                                    autoFocus
-                                    label="Documento Federal"
-                                    variant="bordered"
-                                    onChange={(e) => (document.current = e.target.value)}
-                                />
-                                <Input
-                                    label="Senha"
-                                    type="password"
-                                    variant="bordered"
-                                    onChange={(e) => (password.current = e.target.value)}
-                                />
-                            </ModalBody>
-                            <ModalFooter>
-                                <Button color="danger" variant="flat" onPress={onClose}>
-                                    Fechar
-                                </Button>
-                                <Button color="primary" onPress={login}>
-                                    Entrar
-                                </Button>
-                            </ModalFooter>
-                        </>
-                    )}
-                </ModalContent>
-            </Modal>
-
             <Navbar disableAnimation isBordered className="shadow-lg">
                 <NavbarContent className="sm:hidden" justify="start">
                     <NavbarMenuToggle />
@@ -129,7 +74,7 @@ export default function CommomNavbar({ children }: Props) {
                         <Button onPress={onOpen} color="primary">Entrar</Button>
                     </NavbarItem>
                     <NavbarItem>
-                        <Button as={Link} href="#" variant="flat">
+                        <Button onPress={onOpenRegister} as={Link} href="#" variant="flat">
                             Cadastre-se
                         </Button>
                     </NavbarItem>
@@ -152,6 +97,9 @@ export default function CommomNavbar({ children }: Props) {
                 </NavbarMenu>
             </Navbar>
             {children}
+
+            <LoginModal isOpen={isOpen} onOpenChange={onOpenChange}></LoginModal>
+            <RegisterModal isOpen={isOpenRegister} isOpenChange={onOpenRegisterChange}></RegisterModal>
         </div>
     )
 }

@@ -22,9 +22,9 @@ export const authOptions: NextAuthOptions = {
                         'Content-Type': 'application/json'
                     }
                 })
-
+                                
                 const data = await res.json()
-
+                
                 if (res.ok && data) {
                     return {
                         id: data.codigoUsuario,
@@ -33,7 +33,7 @@ export const authOptions: NextAuthOptions = {
                         tipoPerfil: data.tipoPerfil
                     }
                 } else {
-                    throw Error(data.mensagem)
+                    throw Error(data.mensagem || data.detail)
                 }
 
                 return null

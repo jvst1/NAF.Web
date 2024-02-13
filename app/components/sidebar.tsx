@@ -22,7 +22,7 @@ export default function AuthenticatedSidebar({ children }: Props) {
   const pathname = usePathname()
 
   useEffect(() => {
-    const menuItems = getUserRoutes(session?.user.tipoUsuario)
+    const menuItems = getUserRoutes(session?.user.tipoPerfil)
 
     setMenuItems(menuItems)
   }, [session])
