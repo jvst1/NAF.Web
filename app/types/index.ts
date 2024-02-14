@@ -26,3 +26,7 @@ export interface Operador {
     tipoPerfil: number,
     situacao: number
 }
+
+export interface Task {
+    codigo: string
+}

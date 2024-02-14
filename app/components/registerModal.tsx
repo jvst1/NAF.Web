@@ -45,7 +45,6 @@ export default function RegisterModal({ isOpen, onOpenChange }: any) {
             const data = res.json()
 
             data.then((error) => {
-                console.log(error)
                 toast(error.mensagem || error.detail, { type: "error", autoClose: 2000 })
             })
         }

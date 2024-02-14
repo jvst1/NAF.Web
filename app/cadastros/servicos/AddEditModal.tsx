@@ -34,7 +34,6 @@ export default function AddEditModal({ refresh, isOpen, onOpenChange, item, area
                 }
             }).then((res) => {
                 if (res.ok) {
-                    console.log(res)
                     toast('PerguntaFrequente atualizada com sucesso.', { type: 'success', autoClose: 2000 })
                     refresh()
                     closeModal()
@@ -56,7 +55,6 @@ export default function AddEditModal({ refresh, isOpen, onOpenChange, item, area
                 }
             }).then((res) => {
                 if (res.ok) {
-                    console.log(res)
                     toast('PerguntaFrequente criada com sucesso.', { type: 'success', autoClose: 2000 })
                     refresh()
                     closeModal()
