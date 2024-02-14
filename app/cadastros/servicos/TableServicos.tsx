@@ -7,6 +7,7 @@ import { getSession } from 'next-auth/react';
 import { SearchIcon } from '@/app/assets/icons/SearchIcon';
 import { AddIcon } from '@/app/assets/icons/AddIcon';
 import { EditIcon } from "@/app/assets/icons/EditIcon";
+import { format } from 'date-fns';
 
 export default function TableServicos({ items, refresh, openEditModal, openAddModal }: any) {
     const [page, setPage] = React.useState(1);
@@ -16,6 +17,7 @@ export default function TableServicos({ items, refresh, openEditModal, openAddMo
         { name: "NOME", uid: "nome" },
         { name: "DESCRIÇÃO", uid: "descricao" },
         { name: "DATA ALTERAÇÃO", uid: "dtAlteracao" },
+        { name: "AÇÕES", uid: "actions" }
     ]
 
     async function deleteServico(codigo: string) {
@@ -134,6 +136,11 @@ export default function TableServicos({ items, refresh, openEditModal, openAddMo
                             <TableCell>
                                 <div className="flex flex-col">
                                     <p className="text-bold text-sm capitalize truncate">{item.descricao}</p>
+                                </div>
+                            </TableCell>
+                            <TableCell>
+                                <div className="flex flex-col">
+                                    <p className="text-bold text-sm capitalize truncate">{format(new Date(item.dtAlteracao), 'dd/MM/yyyy')}</p>
                                 </div>
                             </TableCell>
                             <TableCell>

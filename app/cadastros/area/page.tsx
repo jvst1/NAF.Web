@@ -34,6 +34,7 @@ export default function Area() {
             })
 
             const response = await query.json()
+
             setItems(response)
         }
         getData()

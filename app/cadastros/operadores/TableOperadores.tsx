@@ -19,7 +19,8 @@ export default function TableOperadores({ items, refresh, openEditModal, openAdd
         { name: "EMAIL", uid: "email" },
         { name: "TELEFONE", uid: "telefoneCelular" },
         { name: "TIPO PERFIL", uid: "tipoPerfil" },
-        { name: "SITUAÇÃO", uid: "situacao" }
+        { name: "SITUAÇÃO", uid: "situacao" },
+        { name: "AÇÕES", uid: "actions" }
     ]
 
     async function deleteOperador(codigo: string) {

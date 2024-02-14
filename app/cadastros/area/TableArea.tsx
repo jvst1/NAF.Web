@@ -7,6 +7,7 @@ import { getSession } from 'next-auth/react';
 import { SearchIcon } from '@/app/assets/icons/SearchIcon';
 import { AddIcon } from '@/app/assets/icons/AddIcon';
 import { EditIcon } from "@/app/assets/icons/EditIcon";
+import { format } from 'date-fns';
 
 export default function TableArea({ items, refresh, openEditModal, openAddModal }: any) {
     const [page, setPage] = React.useState(1);
@@ -15,7 +16,8 @@ export default function TableArea({ items, refresh, openEditModal, openAddModal 
     const columns = [
         { name: "NOME", uid: "nome" },
         { name: "DATA ALTERAÇÃO", uid: "dtAlteracao" },
-        { name: "DATA INCLUSÃO", uid: "dtInclusao" }
+        { name: "DATA INCLUSÃO", uid: "dtInclusao" },
+        { name: "AÇÕES", uid: "actions" }
     ]
 
     async function deleteArea(codigo: string) {
@@ -133,12 +135,12 @@ export default function TableArea({ items, refresh, openEditModal, openAddModal 
                             </TableCell>
                             <TableCell>
                                 <div className="flex flex-col">
-                                    <p className="text-bold text-sm capitalize truncate">{item.dtAlteracao}</p>
+                                    <p className="text-bold text-sm capitalize truncate">{format(new Date(item.dtAlteracao), 'dd/MM/yyyy')}</p>
                                 </div>
                             </TableCell>
                             <TableCell>
                                 <div className="flex flex-col">
-                                    <p className="text-bold text-sm capitalize truncate">{item.dtInclusao}</p>
+                                    <p className="text-bold text-sm capitalize truncate">{format(new Date(item.dtInclusao), 'dd/MM/yyyy')}</p>
                                 </div>
                             </TableCell>
                             <TableCell>

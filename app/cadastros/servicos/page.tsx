@@ -54,7 +54,7 @@ export default function Servicos() {
     }
 
     function openEditModal(item: Servico) {
-        // getAreas()
+        getAreas()
         setItem(item)
         onOpen()
     }
@@ -67,7 +67,7 @@ export default function Servicos() {
             descricao: "",
             area: ""
         }
-        // getAreas()
+        getAreas()
         setItem(servico)
         onOpen()
     }

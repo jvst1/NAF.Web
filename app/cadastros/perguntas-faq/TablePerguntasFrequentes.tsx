@@ -7,6 +7,7 @@ import { getSession } from 'next-auth/react';
 import { SearchIcon } from '@/app/assets/icons/SearchIcon';
 import { AddIcon } from '@/app/assets/icons/AddIcon';
 import { EditIcon } from "@/app/assets/icons/EditIcon";
+import { format } from 'date-fns';
 
 export default function TablePerguntasFrequentes({ items, refresh, openEditModal, openAddModal }: any) {
     const [page, setPage] = React.useState(1);
@@ -15,7 +16,8 @@ export default function TablePerguntasFrequentes({ items, refresh, openEditModal
     const columns = [
         { name: "PERGUNTA", uid: "pergunta" },
         { name: "RESPOSTA", uid: "resposta" },
-        { name: "DATA INCLUSÃO", uid: "dtInclusao" }
+        { name: "DATA INCLUSÃO", uid: "dtInclusao" },
+        { name: "AÇÕES", uid: "actions" }
     ]
 
     async function deletePerguntaFrequente(codigo: string) {
@@ -28,7 +30,7 @@ export default function TablePerguntasFrequentes({ items, refresh, openEditModal
             }
         }).then((res) => {
             if (res.ok) {
-                toast('Deletado com sucesso', { type: 'success', autoClose: 2000 })
+                toast('Pergunta frequente apagada com sucesso.', { type: 'success', autoClose: 2000 })
                 refresh()
             } else {
                 const data = res.json()
@@ -128,17 +130,17 @@ export default function TablePerguntasFrequentes({ items, refresh, openEditModal
                         <TableRow key={item.codigo}>
                             <TableCell>
                                 <div className="flex flex-col">
-                                    <p className="text-bold text-sm capitalize truncate">{item.perguntas}</p>
+                                    <p className="text-bold text-sm capitalize truncate">{item.pergunta}</p>
                                 </div>
                             </TableCell>
                             <TableCell>
                                 <div className="flex flex-col">
-                                    <p className="text-bold text-sm capitalize truncate">{item.respostas}</p>
+                                    <p className="text-bold text-sm capitalize truncate">{item.resposta}</p>
                                 </div>
                             </TableCell>
                             <TableCell>
                                 <div className="flex flex-col">
-                                    <p className="text-bold text-sm capitalize truncate">{item.dtInclusao}</p>
+                                    <p className="text-bold text-sm capitalize truncate">{format(new Date(item.dtInclusao), 'dd/MM/yyyy')}</p>
                                 </div>
                             </TableCell>
                             <TableCell>

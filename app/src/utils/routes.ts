@@ -18,7 +18,7 @@ export const routes: Routes[] = [
     { name: "Usuários", route: "/cadastros/operadores", allRoles: false, roles: [TipoUsuario.Professor] },
     { name: "Área", route: "/cadastros/area", allRoles: false, roles: [TipoUsuario.Professor] },
     { name: "Serviços", route: "/cadastros/servicos", allRoles: false, roles: [TipoUsuario.Professor] },
-    { name: "Perguntas Frequêntes", route: "/cadastros/perguntas-faq", allRoles: false, roles: [TipoUsuario.Professor] }
+    { name: "Perguntas Frequentes", route: "/cadastros/perguntas-faq", allRoles: false, roles: [TipoUsuario.Professor, TipoUsuario.Aluno] }
 ]
 
 export function getUserRoutes(tipoPerfil: any): Routes[] {

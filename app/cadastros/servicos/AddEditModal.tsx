@@ -14,6 +14,62 @@ export default function AddEditModal({ refresh, isOpen, onOpenChange, item, area
     };
 
     async function submit(closeModal: any) {
+        const codigoArea = areas[area].codigo
+
+        let req = {
+            codigoArea: codigoArea,
+            nome: nome,
+            descricao: descricao
+        }
+
+        const session = await getSession()
+
+        if (item.codigo) {
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/Servico/` + item.codigo, {
+                method: 'PUT',
+                body: JSON.stringify(req),
+                headers: {
+                    authorization: `Bearer ${session?.user.token}`,
+                    'Content-Type': 'application/json',
+                }
+            }).then((res) => {
+                if (res.ok) {
+                    console.log(res)
+                    toast('PerguntaFrequente atualizada com sucesso.', { type: 'success', autoClose: 2000 })
+                    refresh()
+                    closeModal()
+                } else {
+                    const data = res.json()
+
+                    data.then((error) => {
+                        toast(error.mensagem, { type: 'error', autoClose: 2000 })
+                    })
+                }
+            })
+        } else {
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/Servico`, {
+                method: 'POST',
+                body: JSON.stringify(req),
+                headers: {
+                    authorization: `Bearer ${session?.user.token}`,
+                    'Content-Type': 'application/json',
+                }
+            }).then((res) => {
+                if (res.ok) {
+                    console.log(res)
+                    toast('PerguntaFrequente criada com sucesso.', { type: 'success', autoClose: 2000 })
+                    refresh()
+                    closeModal()
+                } else {
+                    const data = res.json()
+
+                    data.then((error) => {
+                        toast(error.mensagem, { type: 'error', autoClose: 2000 })
+                    })
+                }
+            })
+        }
+
         closeModal()
     }
 
@@ -21,6 +77,7 @@ export default function AddEditModal({ refresh, isOpen, onOpenChange, item, area
         if (item) {
             setNome(item.nome)
             setDescricao(item.descricao)
+            setArea(item.codigoArea)
         }
     }, [item])
 
@@ -37,10 +94,11 @@ export default function AddEditModal({ refresh, isOpen, onOpenChange, item, area
                                     placeholder="Selecione"
                                     selectedKeys={area}
                                     onChange={handleSelectionArea}
+
                                 >
-                                    {areas.map((area: any) => (
-                                        <SelectItem key={area.value} value={area.value}>
-                                            {area.text}
+                                    {areas.map((area: any, index: any) => (
+                                        <SelectItem key={index} value={area.codigo}>
+                                            {area.nome}
                                         </SelectItem>
                                     ))}
                                 </Select>
