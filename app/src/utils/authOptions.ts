@@ -22,7 +22,8 @@ export const authOptions: NextAuthOptions = {
                         'Content-Type': 'application/json'
                     }
                 })
-                                
+                console.log(`${process.env.NEXT_PUBLIC_API_URL}/Auth/login`, JSON.stringify(request), res.json());
+
                 const data = await res.json()
                 
                 if (res.ok && data) {
