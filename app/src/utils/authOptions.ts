@@ -14,7 +14,10 @@ export const authOptions: NextAuthOptions = {
                     documentoFederal: credentials?.document,
                     password: credentials?.password
                 }
-
+                
+                console.log(process.env.NEXT_PUBLIC_API_URL);
+                console.log(`${process.env.NEXT_PUBLIC_API_URL}/Auth/login`);
+                console.log(JSON.stringify(request));
                 var res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Auth/login`, {
                     method: 'POST',
                     body: JSON.stringify(request),
@@ -22,10 +25,9 @@ export const authOptions: NextAuthOptions = {
                         'Content-Type': 'application/json'
                     }
                 })
-                console.log(`${process.env.NEXT_PUBLIC_API_URL}/Auth/login`, JSON.stringify(request), res.json());
 
                 const data = await res.json()
-                
+
                 if (res.ok && data) {
                     return {
                         id: data.codigoUsuario,
