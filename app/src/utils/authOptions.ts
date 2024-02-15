@@ -15,10 +15,7 @@ export const authOptions: NextAuthOptions = {
                     password: credentials?.password
                 }
                 
-                console.log(process.env.NEXT_PUBLIC_API_URL);
-                console.log(`${process.env.NEXT_PUBLIC_API_URL}/Auth/login`);
-                console.log(JSON.stringify(request));
-                var res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Auth/login`, {
+                var res = await fetch(`https://naf.jvst.com.br/api/Auth/login`, {
                     method: 'POST',
                     body: JSON.stringify(request),
                     headers: {

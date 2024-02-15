@@ -19,7 +19,7 @@ export default function LoginModal({ isOpen, onOpenChange }: any) {
         })
 
         isOpen = false
-        console.log(result)
+        
         if (result?.ok)
             router.replace('/dashboard')
         else
