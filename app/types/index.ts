@@ -1,5 +1,4 @@
 export interface Servico {
-    codigo: string,
     codigoArea: string,
     area: string,
     nome: string,
@@ -20,13 +19,9 @@ export interface Area {
 export interface Operador {
     nome: string,
     identificador: string,
-    documento: string,
+    documentoFederal: string,
     email: string,
     telefoneCelular: string,
     tipoPerfil: number,
     situacao: number
-}
-
-export interface Task {
-    codigo: string
 }

@@ -1,7 +1,7 @@
 export const cardsData = [
     {
         id: 0,
-        title: "To do",
+        title: "Pendente",
         components: [
             {
                 id: 100,
@@ -19,7 +19,7 @@ export const cardsData = [
     },
     {
         id: 1,
-        title: "Doing",
+        title: "Em andamento",
         components: [
             {
                 id: 200,
@@ -29,7 +29,7 @@ export const cardsData = [
     },
     {
         id: 2,
-        title: "Completed",
+        title: "Concluído",
         components: [
             {
                 id: 300,

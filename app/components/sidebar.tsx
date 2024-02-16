@@ -40,7 +40,7 @@ export default function AuthenticatedSidebar({ children }: Props) {
         </div>
         <Button className='mb-8' onClick={logout} color="danger">Sair</Button>
       </div>
-      <div className='col-span-10'>
+      <div className='col-span-10 overflow-y-scroll'>
         {children}
       </div>
     </div>

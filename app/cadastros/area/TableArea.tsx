@@ -152,7 +152,7 @@ export default function TableArea({ items, refresh, openEditModal, openAddModal 
                                             </div>
                                         </span>
                                     </Tooltip>
-                                    <Tooltip color="danger" content="Desvíncular da atlética">
+                                    <Tooltip color="danger" content="Deletar">
                                         <span className="text-lg text-danger cursor-pointer active:opacity-50">
                                             <div onClick={(e) => deleteArea(item.codigo)}>
                                                 <DeleteIcon />

@@ -18,3 +18,28 @@
 ::-webkit-scrollbar-thumb:hover {
     background: #555;
 }
+
+.file-list {
+    list-style-type: none; /* Removes default list styling */
+    padding: 0; /* Removes default padding */
+}
+
+.file-item {
+    border: 1px solid #ddd; /* Adds a border around each file item */
+    margin-top: 8px; /* Adds margin to the top of each file item */
+    padding: 10px; /* Adds padding inside each file item */
+    display: flex; /* Aligns the file info and the image preview side by side */
+    align-items: center; /* Aligns items vertically in the center */
+}
+
+.file-details {
+    margin-left: 15px; /* Adds margin between the image preview and the file details */
+}
+
+.img-preview {
+    width: 60px; /* Sets a fixed width for the image preview */
+    height: 60px; /* Sets a fixed height for the image preview */
+    object-fit: cover; /* Ensures the image covers the area, cropping if necessary */
+    border-radius: 5px; /* Optional: Rounds the corners of the image preview */
+    background-color: #f2f2f2; /* Adds a background color to the image preview area */
+}

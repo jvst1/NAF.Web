@@ -129,17 +129,17 @@ export default function TableServicos({ items, refresh, openEditModal, openAddMo
                     {(item: any) => (
                         <TableRow key={item.codigo}>
                             <TableCell>
-                                <div className="flex flex-col">
+                                <div className="flex flex-col w-96">
                                     <p className="text-bold text-sm capitalize truncate">{item.nome}</p>
                                 </div>
                             </TableCell>
                             <TableCell>
-                                <div className="flex flex-col">
+                                <div className="flex flex-col w-96">
                                     <p className="text-bold text-sm capitalize truncate">{item.descricao}</p>
                                 </div>
                             </TableCell>
                             <TableCell>
-                                <div className="flex flex-col">
+                                <div className="flex flex-col w-96">
                                     <p className="text-bold text-sm capitalize truncate">{format(new Date(item.dtAlteracao), 'dd/MM/yyyy')}</p>
                                 </div>
                             </TableCell>
@@ -152,7 +152,7 @@ export default function TableServicos({ items, refresh, openEditModal, openAddMo
                                             </div>
                                         </span>
                                     </Tooltip>
-                                    <Tooltip color="danger" content="Desvíncular da atlética">
+                                    <Tooltip color="danger" content="Deletar">
                                         <span className="text-lg text-danger cursor-pointer active:opacity-50">
                                             <div onClick={(e) => deleteServico(item.codigo)}>
                                                 <DeleteIcon />

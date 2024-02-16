@@ -26,7 +26,7 @@ export default function Operadores() {
         const getData = async () => {
             const ses = await getSession()
 
-            const query = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Operador`, {
+            const query = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/User/Operador`, {
                 headers: {
                     authorization: `Bearer ${ses?.user.token}`,
                     'Content-Type': 'application/json',
@@ -48,7 +48,7 @@ export default function Operadores() {
         var operador: Operador = {
             nome: "",
             identificador: "",
-            documento: "",
+            documentoFederal: "",
             email: "",
             telefoneCelular: "",
             tipoPerfil: 1,

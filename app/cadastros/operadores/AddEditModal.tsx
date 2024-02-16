@@ -40,7 +40,7 @@ export default function AddEditModal({ refresh, isOpen, onOpenChange, item }: an
         if (item) {
             setNome(item.nome)
             setIdentificador(item.identificador)
-            setDocumento(item.documento)
+            setDocumento(item.documentoFederal)
             setEmail(item.email)
             setTelefone(item.telefoneCelular)
             setTipoPerfil(item.tipoPerfil.toString())

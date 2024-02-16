@@ -28,7 +28,7 @@ export const authOptions: NextAuthOptions = {
                 if (res.ok && data) {
                     return {
                         id: data.codigoUsuario,
-                        nome: data.email,
+                        email: data.email,
                         token: data.token,
                         tipoPerfil: data.tipoPerfil
                     }
