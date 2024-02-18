@@ -14,7 +14,7 @@ export const authOptions: NextAuthOptions = {
                     documentoFederal: credentials?.document,
                     password: credentials?.password
                 }
-                
+
                 var res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Auth/login`, {
                     method: 'POST',
                     body: JSON.stringify(request),
@@ -40,11 +40,10 @@ export const authOptions: NextAuthOptions = {
             }
         })
     ],
-
+    secret: process.env.NEXTAUTH_SECRET,
     pages: {
         signIn: "/"
     },
-
     callbacks: {
         async jwt({ token, user }) {
             return { ...token, ...user };
