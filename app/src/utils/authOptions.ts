@@ -1,5 +1,6 @@
 import { NextAuthOptions } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import { toast } from 'react-toastify';
 
 export const authOptions: NextAuthOptions = {
     providers: [
@@ -14,14 +15,21 @@ export const authOptions: NextAuthOptions = {
                     documentoFederal: credentials?.document,
                     password: credentials?.password
                 }
-                
-                var res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Auth/login`, {
-                    method: 'POST',
-                    body: JSON.stringify(request),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
+
+                var res;
+                try {
+                    res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Auth/login`, {
+                        method: 'POST',
+                        body: JSON.stringify(request),
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    toast(JSON.stringify(res))
+                } catch (error: any) {
+                    toast(JSON.stringify(error))
+                    throw new Error(error);
+                }
 
                 const data = await res.json()
 
@@ -40,11 +48,10 @@ export const authOptions: NextAuthOptions = {
             }
         })
     ],
-
+    secret: process.env.NEXTAUTH_SECRET,
     pages: {
         signIn: "/"
     },
-
     callbacks: {
         async jwt({ token, user }) {
             return { ...token, ...user };

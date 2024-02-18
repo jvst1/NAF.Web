@@ -1,14 +1,7 @@
 import React, { useRef, useState } from "react";
 
-import {
-  Button,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Input,
-} from "@nextui-org/react";
+import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input } from "@nextui-org/react";
+
 import { getSession, signIn } from "next-auth/react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
@@ -37,8 +30,15 @@ export default function LoginModal({ isOpen, onOpenChange }: any) {
       } else {
         router.replace("/dashboard");
       }
-    } else toast(result?.error, { type: "error", autoClose: 2000 });
+    } else {
+      toast(result?.error, { type: "error", autoClose: 2000 });
+    }
   }
+
+  const redirectToRecuperar = (closeModal: any) => {
+    closeModal();
+    router.push("/lembrar");
+  };
 
   return (
     <>
@@ -71,6 +71,9 @@ export default function LoginModal({ isOpen, onOpenChange }: any) {
                   variant="bordered"
                   onChange={(e) => (password.current = e.target.value)}
                 />
+                <p className="text-sm text-blue-500 mt-2 cursor-pointer" onClick={(e) => redirectToRecuperar(onClose)}>
+                  Esqueceu sua senha?
+                </p>
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="flat" onPress={onClose}>

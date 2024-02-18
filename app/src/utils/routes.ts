@@ -12,6 +12,7 @@ export interface Routes {
 }
 
 export const routes: Routes[] = [
+    { name: "Perfil", route: "/perfil", roles: [TipoUsuario.Comunidade, TipoUsuario.Aluno, TipoUsuario.Professor] },
     { name: "Dashboard", route: "/dashboard", roles: [TipoUsuario.Comunidade] },
     { name: "Board", route: "/board", roles: [TipoUsuario.Aluno, TipoUsuario.Professor] },
     { name: "Perguntas Frequentes", route: "/cadastros/perguntas-faq", roles: [TipoUsuario.Professor, TipoUsuario.Aluno] },
