@@ -25,12 +25,11 @@ export default function AddEditModal({
   const [area, setArea] = useState("");
   const [nome, setNome] = useState("");
   const [descricao, setDescricao] = useState("");
+  const [horasComplementares, setHorasComplementares] = useState("");
 
   const handleSelectionArea = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setArea(e.target.value);
   };
-
-  console.log(areas)
 
   async function submit(closeModal: any) {
     const codigoArea = areas[area].codigo;
@@ -39,6 +38,7 @@ export default function AddEditModal({
       codigoArea: codigoArea,
       nome: nome,
       descricao: descricao,
+      horasComplementares: horasComplementares
     };
 
     const session = await getSession();
@@ -100,15 +100,17 @@ export default function AddEditModal({
     if (item?.codigo) {
       setNome(item.nome);
       setDescricao(item.descricao);
+      setHorasComplementares(item.horasComplementares)
 
-      if(areas.length > 0) {
-        var area = areas.find((area: any) => area.codigo === item.codigoArea)
-        setArea(area.id.toString())
+      if (areas.length > 0) {
+        var area = areas.find((area: any) => area.codigo === item.codigoArea);
+        setArea(area.id.toString());
       }
     } else {
-        setNome("")
-        setDescricao("")
-        setArea("")
+      setNome("");
+      setDescricao("");
+      setArea("");
+      setHorasComplementares("0")
     }
   }, [item, areas]);
 
@@ -151,6 +153,13 @@ export default function AddEditModal({
                   }}
                   value={descricao}
                   onChange={(e: any) => setDescricao(e.target.value)}
+                />
+
+                <Input
+                  type="text"
+                  label="Horas Complementares"
+                  value={horasComplementares}
+                  onChange={(e: any) => setHorasComplementares(e.target.value)}
                 />
               </ModalBody>
               <ModalFooter>

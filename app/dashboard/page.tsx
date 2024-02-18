@@ -4,7 +4,7 @@ import { Card, CardBody, useDisclosure, Button } from "@nextui-org/react";
 import { AddIcon } from "@/app/assets/icons/AddIcon";
 import { getSession, useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
-import AddNewTaskModal from "./AddNewTaskModal";
+import AddNewTaskModal from "../components/AddNewTaskModal";
 import { format } from "date-fns";
 import { situacoesTask } from "../src/utils/enums";
 

@@ -135,7 +135,7 @@ export default function RegisterModal({ isOpen, onOpenChange }: any) {
               <ModalBody className="grid grid-cols-12">
                 <Input
                   autoFocus
-                  label="Nome"
+                  label="Nome Completo"
                   variant="bordered"
                   className="col-span-12"
                   onChange={(e) => (name.current = e.target.value)}

@@ -30,6 +30,8 @@ export default function AddNewTaskModal({
   const [servico, setServico] = useState("");
   const [solicitante, setSolicitante] = useState("");
 
+  const [comment, setComment] = useState("");
+
   const [titulo, setTitulo] = useState("");
   const [descricao, setDescricao] = useState("");
 
@@ -138,6 +140,42 @@ export default function AddNewTaskModal({
     }
   }
 
+  async function comentar(taskId: any) {
+    const session = await getSession();
+
+    var req = {
+      codigoUsuario: session?.user.id,
+      mensagem: comment
+    };
+
+    await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/Chamado/${taskId}/Comentario`,
+      {
+        method: "POST",
+        body: JSON.stringify(req),
+        headers: {
+          authorization: `Bearer ${session?.user.token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    ).then(async (res) => {
+      const data = await res.json();
+
+      if (res.ok) {
+        toast("Comentário anexado com sucesso.", {
+          type: "success",
+          autoClose: 2000,
+        });
+        setComment("")
+        refresh();
+      } else {
+        data.then((error: any) => {
+          toast(error.mensagem, { type: "error", autoClose: 2000 });
+        });
+      }
+    });
+  }
+
   useEffect(() => {
     if (item?.codigo) {
       setTitulo(item.titulo);
@@ -152,6 +190,26 @@ export default function AddNewTaskModal({
         );
         setArea(servico[0]?.area.nome);
       }
+
+      const getComentarios = async () => {
+        const session = await getSession();
+
+        const query = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/Chamado/${item.codigo}/Comentario`,
+          {
+            headers: {
+              authorization: `Bearer ${session?.user.token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        const response = await query.json();
+
+        console.log(response);
+      };
+
+      getComentarios();
     }
   }, [item, servicos]);
 
@@ -245,8 +303,26 @@ export default function AddNewTaskModal({
                           </div>
                         </Card>
                         <Card className="bg-gray-200 h-1/2 gap-4 p-4 flex flex-col justify-between">
-                          <div className="bg-white h-1/3 rounded-lg p-4 flex items-center">
+                          <div className="bg-white h-1/3 rounded-lg p-4 flex items-center gap-4">
                             <Avatar />
+
+                            <Textarea
+                              disableAutosize
+                              label="Comentar"
+                              className="w-full mt-4 h-full"
+                              classNames={{
+                                input: "resize-y  min-h-[30px] max-h-[30px]",
+                              }}
+                              value={comment}
+                              onChange={(e: any) => setComment(e.target.value)}
+                            />
+
+                            <Button
+                              color="primary"
+                              onPress={(e: any) => comentar(item.codigo)}
+                            >
+                              Enviar
+                            </Button>
                           </div>
                           <div className="bg-white h-full rounded-lg p-4 overflow-y-scroll">
                             <div className="bg-white h-1/3 rounded-lg flex items-center">

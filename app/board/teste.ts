@@ -1,40 +1,27 @@
-export const cardsData = [
-    {
-        id: 0,
-        title: "Pendente",
-        components: [
-            {
-                id: 100,
-                name: "Teste"
-            },
-            {
-                id: 150,
-                name: "Teste 2"
-            },
-            {
-                id: 170,
-                name: "Teste 2"
-            }
-        ]
-    },
-    {
-        id: 1,
-        title: "Em andamento",
-        components: [
-            {
-                id: 200,
-                name: "Teste 2"
-            }
-        ]
-    },
-    {
-        id: 2,
-        title: "Concluído",
-        components: [
-            {
-                id: 300,
-                name: "Teste 3"
-            }
-        ]
-    }
-]
+export const cardsData: Data[] = [
+  {
+    id: 0,
+    title: "Pendente",
+    components: [],
+  },
+  {
+    id: 1,
+    title: "Em andamento",
+    components: [],
+  },
+  {
+    id: 2,
+    title: "Concluído",
+    components: [],
+  },
+];
+
+export interface Data {
+  id: number;
+  title: string;
+  components: {
+    codigo: number;
+    titulo: string;
+    descricao: string;
+  }[];
+}
