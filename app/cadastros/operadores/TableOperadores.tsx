@@ -11,6 +11,7 @@ import {
   Pagination,
   Input,
   Button,
+  useDisclosure
 } from "@nextui-org/react";
 import { DeleteIcon } from "@/app/assets/icons/DeleteIcon";
 import { toast } from "react-toastify";
@@ -19,6 +20,8 @@ import { SearchIcon } from "@/app/assets/icons/SearchIcon";
 import { AddIcon } from "@/app/assets/icons/AddIcon";
 import { EditIcon } from "@/app/assets/icons/EditIcon";
 import { situacoes, tiposPerfil } from "@/app/src/utils/enums";
+import ReportIcon from "@/app/assets/icons/ReportIcon";
+import ReportOperadoresModal from "./ReportOperadoresModal";
 
 export default function TableOperadores({
   items,
@@ -28,6 +31,9 @@ export default function TableOperadores({
 }: any) {
   const [page, setPage] = React.useState(1);
   const [filterValue, setFilterValue] = React.useState("");
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [item, setItem] = React.useState<any>();
+
 
   const columns = [
     { name: "NOME", uid: "nome" },
@@ -60,6 +66,12 @@ export default function TableOperadores({
         });
       }
     });
+  }
+
+  function openReportModal(item: any) {
+    console.log(item);
+    setItem(item);
+    onOpen();
   }
 
   const rowsPerPage = 10;
@@ -227,12 +239,21 @@ export default function TableOperadores({
                       </div>
                     </span>
                   </Tooltip>
+                  <Tooltip color="success" content="Relatório">
+                    <span className="text-lg text-success cursor-pointer active:opacity-50">
+                      <div onClick={(e) => openReportModal(item)}>
+                        <ReportIcon />
+                      </div>
+                    </span>
+                  </Tooltip>
                 </div>
               </TableCell>
             </TableRow>
           )}
         </TableBody>
       </Table>
+
+      <ReportOperadoresModal isOpen={isOpen} onOpenChange={onOpenChange} refresh={refresh} item={item}></ReportOperadoresModal>
     </>
   );
 }
