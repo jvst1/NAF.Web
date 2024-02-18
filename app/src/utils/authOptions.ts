@@ -15,14 +15,20 @@ export const authOptions: NextAuthOptions = {
                     password: credentials?.password
                 }
 
-                var res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Auth/login`, {
-                    method: 'POST',
-                    body: JSON.stringify(request),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-
+                var res;
+                try {
+                    res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Auth/login`, {
+                        method: 'POST',
+                        body: JSON.stringify(request),
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                } catch (error) {
+                    console.error('Fetch error:', error);
+                    throw new Error('Error contacting authentication server: ' + error);
+                }
+                
                 const data = await res.json()
 
                 if (res.ok && data) {
