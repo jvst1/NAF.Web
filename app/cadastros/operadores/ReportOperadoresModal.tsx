@@ -10,7 +10,7 @@ export default function ReportOperadoresModal({ refresh, isOpen, onOpenChange, i
         const getData = async () => {
             const ses = await getSession();
 
-            const query = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Chamado/Operador/${item.Codigo}`, {
+            const query = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Chamado/Operador/${item.codigo}`, {
                 headers: {
                     authorization: `Bearer ${ses?.user.token}`,
                     "Content-Type": "application/json",
@@ -20,6 +20,7 @@ export default function ReportOperadoresModal({ refresh, isOpen, onOpenChange, i
             var response = await query.json();
             setItems(response);
         }
+        getData();
     })
 
     return (
