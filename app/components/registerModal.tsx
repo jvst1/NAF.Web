@@ -32,7 +32,7 @@ export default function RegisterModal({ isOpen, onOpenChange }: any) {
 
   const router = useRouter();
 
-  async function register() {
+  async function register(closeModal: any) {
     var request = {
       name: name.current,
       email: email.current,
@@ -62,6 +62,7 @@ export default function RegisterModal({ isOpen, onOpenChange }: any) {
         autoClose: 2000,
       });
       router.replace("/");
+      closeModal()
     } else {
       const data = res.json();
 
@@ -194,7 +195,7 @@ export default function RegisterModal({ isOpen, onOpenChange }: any) {
                 <Button color="danger" variant="flat" onPress={onClose}>
                   Fechar
                 </Button>
-                <Button color="primary" onPress={register}>
+                <Button color="primary" onPress={(e) => register(onClose)}>
                   Cadastrar-se
                 </Button>
               </ModalFooter>

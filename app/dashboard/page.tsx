@@ -4,9 +4,9 @@ import { Card, CardBody, useDisclosure, Button } from "@nextui-org/react";
 import { AddIcon } from "@/app/assets/icons/AddIcon";
 import { getSession, useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
-import AddNewTaskModal from "../components/AddNewTaskModal";
 import { format } from "date-fns";
 import { situacoesTask } from "../src/utils/enums";
+import AddNewTaskModal from "../components/AddNewTaskModal";
 
 export default function Dashboard() {
   const { data: session, status } = useSession({
@@ -21,31 +21,37 @@ export default function Dashboard() {
   const [refreshKey, setRefreshKey] = useState(0);
 
   const getServicos = async () => {
-    const queryAreas = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Area`, {
+    const resAreas = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Area`, {
       headers: {
         authorization: `Bearer ${session?.user.token}`,
         "Content-Type": "application/json",
       },
     });
 
-    const responseAreas = await queryAreas.json();
+    if (resAreas.ok && resAreas.status === 200) {
+      const areas = await resAreas.json()
 
-    const query = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Servico`, {
-      headers: {
-        authorization: `Bearer ${session?.user.token}`,
-        "Content-Type": "application/json",
-      },
-    });
+      const resServicos = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Servico`, {
+        headers: {
+          authorization: `Bearer ${session?.user.token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
-    const response = await query.json();
+      if (resServicos.ok && resServicos.status === 200) {
+        const servicos = await resServicos.json();
 
-    response.map((servico: any) => {
-      servico.area = responseAreas.filter(
-        (area: any) => area.codigo === servico.codigoArea
-      )[0];
-    });
+        servicos.map((servico: any) => {
+          servico.area = areas.filter(
+            (area: any) => area.codigo === servico.codigoArea
+          )[0];
+        });
 
-    setServicos(response);
+        setServicos(servicos);
+      } else {
+        setServicos([]);
+      }
+    }
   };
 
   function openAddTask() {
@@ -69,16 +75,20 @@ export default function Dashboard() {
     const getData = async () => {
       const ses = await getSession();
 
-      const query = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Chamado`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Chamado`, {
         headers: {
           authorization: `Bearer ${ses?.user.token}`,
           "Content-Type": "application/json",
         },
       });
 
-      const response = await query.json();
+      if (res.ok && res.status === 200) {
+        const response = await res.json()
 
-      setItems(response);
+        setItems(response)
+      } else {
+        setItems([])
+      }
     };
     getData();
   }, [refreshKey]);

@@ -26,15 +26,20 @@ export default function Operadores() {
         const getData = async () => {
             const ses = await getSession()
 
-            const query = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/User/Operador`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/User/Operador`, {
                 headers: {
                     authorization: `Bearer ${ses?.user.token}`,
                     'Content-Type': 'application/json',
                 }
             })
 
-            const response = await query.json()
-            setItems(response)
+            if (res.ok && res.status === 200) {
+                const response = await res.json()
+
+                setItems(response)
+            } else {
+                setItems([])
+            }
         }
         getData()
     }, [refreshKey])
