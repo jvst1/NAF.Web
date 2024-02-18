@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 
 import {
   Button,
@@ -12,16 +12,18 @@ import {
 import { getSession, signIn } from "next-auth/react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { formatCNPJ, formatCPF } from "@brazilian-utils/brazilian-utils";
+import { clearCpfCnpj } from "../src/utils/clearDocument";
 
 export default function LoginModal({ isOpen, onOpenChange }: any) {
-  const document = useRef("");
+  const [documentoFederal, setDocumentoFederal] = useState("");
   const password = useRef("");
 
   const router = useRouter();
 
   async function login() {
     const result = await signIn("credentials", {
-      document: document.current,
+      document: clearCpfCnpj(documentoFederal),
       password: password.current,
       redirect: false,
     });
@@ -40,7 +42,7 @@ export default function LoginModal({ isOpen, onOpenChange }: any) {
 
   return (
     <>
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="top-center">
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="top-center" isDismissable={false}>
         <ModalContent>
           {(onClose) => (
             <>
@@ -50,7 +52,18 @@ export default function LoginModal({ isOpen, onOpenChange }: any) {
                   autoFocus
                   label="Documento Federal"
                   variant="bordered"
-                  onChange={(e) => (document.current = e.target.value)}
+                  value={documentoFederal}
+                  onChange={(e) => {
+                    const { value } = e.target;
+
+                    let doc = clearCpfCnpj(value)
+
+                    if (doc.length <= 11) {
+                      setDocumentoFederal(formatCPF(value));
+                    } else {
+                      setDocumentoFederal(formatCNPJ(value))
+                    }
+                  }}
                 />
                 <Input
                   label="Senha"

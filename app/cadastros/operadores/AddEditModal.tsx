@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
 import { Button, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Select, SelectItem } from "@nextui-org/react";
-import { toast } from 'react-toastify';
-import { getSession } from 'next-auth/react';
+import { situacoes, tiposPerfil } from '@/app/src/utils/enums'
 
 export default function AddEditModal({ refresh, isOpen, onOpenChange, item }: any) {
     const [nome, setNome] = useState("")
@@ -24,17 +23,6 @@ export default function AddEditModal({ refresh, isOpen, onOpenChange, item }: an
     async function submit(closeModal: any) {
         closeModal()
     }
-
-    const tiposPerfil = [
-        { text: "Comunidade", value: 1 },
-        { text: "Universitário", value: 2 },
-        { text: "Professor", value: 3 },
-    ]
-
-    const situacoes = [
-        { text: "Ativo", value: 1 },
-        { text: "Inativo", value: 2 }
-    ]
 
     useEffect(() => {
         if (item) {

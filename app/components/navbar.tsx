@@ -99,7 +99,7 @@ export default function CommomNavbar({ children }: Props) {
             {children}
 
             <LoginModal isOpen={isOpen} onOpenChange={onOpenChange}></LoginModal>
-            <RegisterModal isOpen={isOpenRegister} isOpenChange={onOpenRegisterChange}></RegisterModal>
+            <RegisterModal isOpen={isOpenRegister} onOpenChange={onOpenRegisterChange}></RegisterModal>
         </div>
     )
 }

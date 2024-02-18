@@ -6,6 +6,7 @@ import { getSession, useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 import AddNewTaskModal from "./AddNewTaskModal";
 import { format } from "date-fns";
+import { situacoesTask } from "../src/utils/enums";
 
 export default function Dashboard() {
   const { data: session, status } = useSession({
@@ -82,14 +83,8 @@ export default function Dashboard() {
     getData();
   }, [refreshKey]);
 
-  const situacoes: any[] = [
-    { name: "Pendente", value: 0 },
-    { name: "Em Andamento", value: 1 },
-    { name: "Concluído", value: 2 },
-  ];
-
   function formatSituacao(situacao: any) {
-    return situacoes.find((item) => item.value === situacao).name;
+    return situacoesTask.find((item) => item.value === situacao).text;
   }
 
   return (
