@@ -1,4 +1,5 @@
 export interface Servico {
+    codigo: string | null,
     codigoArea: string,
     area: string,
     nome: string,

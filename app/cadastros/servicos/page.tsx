@@ -61,6 +61,7 @@ export default function Servicos() {
 
     function openAddModal() {
         var servico: Servico = {
+            codigo: null,
             codigoArea: "",
             nome: "",
             descricao: "",
