@@ -1,28 +1,25 @@
 "use client";
 
-// pages/recover-password.tsx
-import React, { useState, useEffect } from 'react';
-import { useRouter, useSearchParams  } from 'next/navigation'; // Correct import
-import { Button, Input, Card } from '@nextui-org/react';
+import React, { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Button, Input } from '@nextui-org/react';
+import { toast } from 'react-toastify';
 
 const RecoverPassword: React.FC = () => {
-    const router = useRouter();
+    const router = useRouter()
     const searchParams = useSearchParams()
 
     const c = searchParams.get('c')
-    const e = searchParams.get('e')
+    const d = searchParams.get('d')
     const t = searchParams.get('t')
 
     const [model, setModel] = useState({
         NovaSenha: '',
-        Login: e as string || '',
+        Login: d as string || '',
         Token: t as string || '',
         CodigoUsuario: c as string || '',
     });
     const [confirmacaoSenha, setConfirmacaoSenha] = useState('');
-    const [msgResetSuccess, setMsgResetSuccess] = useState('');
-    const [msgResetError, setMsgResetError] = useState('');
-    const [validToken, setValidToken] = useState(false);
 
     const recuperarSenha = async () => {
         try {
@@ -33,43 +30,17 @@ const RecoverPassword: React.FC = () => {
                 },
                 body: JSON.stringify(model)
             });
-            const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.message || 'Error resetting password');
+                const data = await response.json();
+                throw new Error(data.detail);
             }
 
-            setMsgResetSuccess(`Password reset successfully for: ${model.Login}`);
+            toast(`Senha alterada com suceso!`, { type: 'success', autoClose: 2000, onClose: () => router.push("/") })
         } catch (error: any) {
-            setMsgResetError(error.message || 'An error occurred');
+            toast(error.message, { type: 'error', autoClose: 5000 })
         }
     };
-
-    const validaToken = async () => {
-        console.log('Implement token validation logic');
-        // Implement your token validation logic here
-        // Example:
-        // try {
-        //     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/User/ValidateToken?token=${model.Token}`);
-        //     const data = await response.json();
-        //     if (data.isValid) {
-        //         setValidToken(true);
-        //     } else {
-        //         setMsgResetError('Invalid or expired token');
-        //         router.push('/login'); // Redirect them to login or another appropriate page
-        //     }
-        // } catch (error: any) {
-        //     setMsgResetError(error.message || 'An error occurred while validating token');
-        // }
-    };
-
-    useEffect(() => {
-        // if (t) {
-        //     validaToken();
-        // } else {
-        //     router.push('/');
-        // }
-    }, [t, router]);
 
     return (
         <div className="flex min-h-screen bg-gray-100 justify-center items-center">
@@ -93,12 +64,14 @@ const RecoverPassword: React.FC = () => {
                         />
                         <Input
                             type="password"
+                            autoComplete="false"
                             placeholder="Nova Senha"
                             value={model.NovaSenha}
                             onChange={(e) => setModel({ ...model, NovaSenha: e.target.value })}
                         />
                         <Input
                             type="password"
+                            autoComplete="false"
                             placeholder="Confirmar Senha"
                             value={confirmacaoSenha}
                             onChange={(e) => setConfirmacaoSenha(e.target.value)}
@@ -122,18 +95,6 @@ const RecoverPassword: React.FC = () => {
                             </div>
                         </div>
                     </form>
-                    {msgResetError && (
-                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                            <strong className="font-bold">Erro!</strong>
-                            <span className="block sm:inline">{msgResetError}</span>
-                        </div>
-                    )}
-                    {msgResetSuccess && (
-                        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-                            <strong className="font-bold">Sucesso!</strong>
-                            <span className="block sm:inline">{msgResetSuccess}</span>
-                        </div>
-                    )}
                 </div>
             </div>
         </div>

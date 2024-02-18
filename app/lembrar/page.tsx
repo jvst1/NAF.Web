@@ -2,12 +2,11 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from 'react-toastify';
 
 export default function Lembrar() {
     const router = useRouter();
     const [model, setModel] = useState({ login: '', primeiroAcesso: false });
-    const [msgRecuperacaoError, setMsgRecuperacaoError] = useState('');
-    const [msgRecuperacaoSuccess, setMsgRecuperacaoSuccess] = useState('');
 
     const recuperarSenha = async () => {
         try {
@@ -18,21 +17,16 @@ export default function Lembrar() {
                 },
                 body: JSON.stringify(model)
             });
-            const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.message);
+                const data = await response.json();
+                throw new Error(data.detail);
             }
 
-            setMsgRecuperacaoSuccess(`Email com link para recuperação de senha enviado para o email relacioando ao documento federal: ${model.login}`);
+            toast(`Enviamos um e-mail com link de recuperação de senha para o email cadastrado!`, { type: 'success', autoClose: 2000, onClose: () => router.push("/")  })
         } catch (error: any) {
-            setMsgRecuperacaoError(error.message);
+            toast(`${error.message}`, { type: 'error', autoClose: 5000 })
         }
-    };
-
-    const clearMsgs = () => {
-        setMsgRecuperacaoError('');
-        setMsgRecuperacaoSuccess('');
     };
 
     return (
@@ -49,13 +43,13 @@ export default function Lembrar() {
                             <input
                                 id="documentoFederal"
                                 name="documentoFederal"
+                                autoComplete="false"
                                 type="text"
                                 required
                                 value={model.login}
                                 onChange={(e) => setModel({ ...model, login: e.target.value })}
                                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                                 placeholder="Informe o documento federal (CPF/CNPJ)"
-                                onKeyPress={clearMsgs}
                             />
                         </div>
                     </div>
@@ -82,37 +76,6 @@ export default function Lembrar() {
                             Enviar Recuperação de Senha
                         </button>
                     </div>
-                    {msgRecuperacaoError && (
-                        <div className="rounded-md bg-red-50 p-4 mt-3">
-                            <div className="flex">
-                                <div className="flex-shrink-0">
-                                    <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                        <path fillRule="evenodd" d="M10 12a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                                        <path fillRule="evenodd" d="M3 8a5 5 0 1110 0H3zm10-4a1 1 0 100-2H7a1 1 0 100 2h6z" clipRule="evenodd" />
-                                    </svg>
-                                </div>
-                                <div className="ml-3">
-                                    <h3 className="text-sm font-medium text-red-800">{msgRecuperacaoError}</h3>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                    {msgRecuperacaoSuccess && (
-                        <div className="rounded-md bg-green-50 p-4 mt-3">
-                            <div className="flex">
-                                <div className="flex-shrink-0">
-                                    <svg className="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                        <path fillRule="evenodd" d="M10 12a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                                        <path fillRule="evenodd" d="M3 8a5 5 0 1110 0H3zm10-4a1 1 0 100-2H7a1 1 0 100 2h6z" clipRule="evenodd" />
-                                    </svg>
-                                </div>
-                                <div className="ml-3">
-                                    <h3 className="text-sm font-medium text-green-800">{msgRecuperacaoSuccess}</h3>
-                                    <a href="/" className="d-block small">Voltar ao login</a>
-                                </div>
-                            </div>
-                        </div>
-                    )}
                 </form>
             </div>
         </div>
