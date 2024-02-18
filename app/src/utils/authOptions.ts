@@ -1,5 +1,6 @@
 import { NextAuthOptions } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import { toast } from 'react-toastify';
 
 export const authOptions: NextAuthOptions = {
     providers: [
@@ -24,11 +25,12 @@ export const authOptions: NextAuthOptions = {
                             'Content-Type': 'application/json'
                         }
                     });
-                } catch (error) {
-                    console.error('Fetch error:', error);
-                    throw new Error('Error contacting authentication server: ' + error);
+                    toast(JSON.stringify(res))
+                } catch (error: any) {
+                    toast(JSON.stringify(error))
+                    throw new Error(error);
                 }
-                
+
                 const data = await res.json()
 
                 if (res.ok && data) {
