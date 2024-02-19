@@ -1,28 +1,27 @@
 import { NextAuthOptions } from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
+import Credentials from "next-auth/providers/credentials";
 
 export const authOptions: NextAuthOptions = {
     providers: [
-        CredentialsProvider({
+        Credentials({
             name: "Credentials",
-            type: "credentials",
             credentials: {
                 document: { label: "Documento Federal", type: "text" },
                 password: { label: "Password", type: "password" }
             },
-            async authorize(credentials, req) {
+            async authorize(credentials: any, req: any) {
                 const request = {
                     documentoFederal: credentials?.document,
                     password: credentials?.password
                 }
-
+                
                 var res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Auth/login`, {
                     method: 'POST',
                     body: JSON.stringify(request),
                     headers: {
                         'Content-Type': 'application/json'
                     }
-                });
+                })
 
                 const data = await res.json()
 
@@ -33,6 +32,8 @@ export const authOptions: NextAuthOptions = {
                         token: data.token,
                         tipoPerfil: data.tipoPerfil
                     }
+                } else {
+                    throw Error(data.mensagem || data.detail)
                 }
 
                 return null
