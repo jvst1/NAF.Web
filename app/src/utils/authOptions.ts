@@ -1,11 +1,9 @@
 import { NextAuthOptions } from "next-auth";
-import Credentials from "next-auth/providers/credentials";
-import { toast } from 'react-toastify';
+import CredentialsProvider from "next-auth/providers/credentials";
 
 export const authOptions: NextAuthOptions = {
     providers: [
-        Credentials({
-            name: "Credentials",
+        CredentialsProvider({
             credentials: {
                 document: { label: "Documento Federal", type: "text" },
                 password: { label: "Password", type: "password" }
@@ -15,21 +13,14 @@ export const authOptions: NextAuthOptions = {
                     documentoFederal: credentials?.document,
                     password: credentials?.password
                 }
-
-                var res;
-                try {
-                    res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Auth/login`, {
-                        method: 'POST',
-                        body: JSON.stringify(request),
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    });
-                    toast(JSON.stringify(res))
-                } catch (error: any) {
-                    toast(JSON.stringify(error))
-                    throw new Error(error);
-                }
+                
+                var res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Auth/login`, {
+                    method: 'POST',
+                    body: JSON.stringify(request),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
 
                 const data = await res.json()
 
