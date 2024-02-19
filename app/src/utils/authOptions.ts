@@ -1,10 +1,9 @@
 import { NextAuthOptions } from "next-auth";
-import Credentials from "next-auth/providers/credentials";
+import CredentialsProvider from "next-auth/providers/credentials";
 
 export const authOptions: NextAuthOptions = {
     providers: [
-        Credentials({
-            name: "Credentials",
+        CredentialsProvider({
             credentials: {
                 document: { label: "Documento Federal", type: "text" },
                 password: { label: "Password", type: "password" }
