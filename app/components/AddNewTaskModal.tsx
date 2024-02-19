@@ -208,6 +208,21 @@ export default function AddNewTaskModal({
     setRefreshFileKey(oldKey => oldKey + 1)
   }
 
+  function getTipoPerifl(tipoPerfil: any) {
+    switch (tipoPerfil) {
+      case "1":
+      case 1:
+        return "Comunidade";
+      case "2":
+      case 2:
+        return "Aluno";
+      case "4":
+      case 4:
+        return "Professor";
+      default:
+        return "";
+    }
+  }
   async function downloadFile(file: any) {
     const session = await getSession();
 
@@ -415,7 +430,7 @@ export default function AddNewTaskModal({
                                         key={index}
                                         value={operador.id}
                                       >
-                                        {operador.nome}
+                                        {operador?.tipoPerfil ? `${getTipoPerifl(operador?.tipoPerfil)} - ${operador?.nome}` : ""}
                                       </SelectItem>
                                     ))}
                                   </Select>

@@ -37,6 +37,22 @@ export default function Home() {
     setRefreshKey((oldKey) => oldKey + 1);
   }
 
+  function getTipoPerifl(tipoPerfil: any) {
+    switch (tipoPerfil) {
+      case "1":
+      case 1:
+        return "Comunidade";
+      case "2":
+      case 2:
+        return "Aluno";
+      case "4":
+      case 4:
+        return "Professor";
+      default:
+        return "";
+    }
+  }
+
   const { data: session, status } = useSession({
     required: true,
   });
@@ -241,13 +257,13 @@ export default function Home() {
                                 value={component?.usuario?.nome}
                                 isDisabled
                               />
-
+                              
                               <Input
                                 type="text"
                                 label="Operador"
                                 size={"sm"}
                                 variant="bordered"
-                                value={component?.operador?.nome}
+                                value={component?.operador?.tipoPerfil ? `${getTipoPerifl(component?.operador?.tipoPerfil)} - ${component?.operador?.nome}` : ""}
                                 isDisabled
                               />
                             </div>
