@@ -69,7 +69,6 @@ export default function TableOperadores({
   }
 
   function openReportModal(item: any) {
-    console.log(item);
     setItem(item);
     onOpen();
   }
