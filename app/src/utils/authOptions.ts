@@ -14,25 +14,29 @@ export const authOptions: NextAuthOptions = {
                     password: credentials?.password
                 }
 
-                var res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Auth/login`, {
-                    method: 'POST',
-                    body: JSON.stringify(request),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
+                try {
+                    var res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Auth/login`, {
+                        method: 'POST',
+                        body: JSON.stringify(request),
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
 
-                const data = await res.json()
+                    const data = await res.json()
 
-                if (res.ok && data) {
-                    return {
-                        id: data.codigoUsuario,
-                        email: data.email,
-                        token: data.token,
-                        tipoPerfil: data.tipoPerfil
+                    if (res.ok && data) {
+                        return {
+                            id: data.codigoUsuario,
+                            email: data.email,
+                            token: data.token,
+                            tipoPerfil: data.tipoPerfil
+                        }
+                    } else {
+                        throw Error(data.mensagem || data.detail)
                     }
-                } else {
-                    throw Error(data.mensagem || data.detail)
+                } catch (e) {
+                    console.log(e)
                 }
 
                 return null
