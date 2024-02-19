@@ -1,35 +1,96 @@
 'use client'
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
+import { getSession, useSession } from "next-auth/react";
+import { toast } from 'react-toastify';
+import { formatCNPJ, formatCPF } from '@brazilian-utils/brazilian-utils';
+import { Input } from '@nextui-org/react';
 
 export default function Perfil() {
-    const router = useRouter();
-    const [usuario, setUsuario] = useState({
-        Nome: '',
-        Identificador: '',
-        Email: '',
-        TelefoneCelular: '',
-        DocumentoFederal: '',
-        TipoPerfil: '',
-        Situacao: '',
+
+    const { data: session, status } = useSession({
+        required: true,
     });
 
-    const handleChange = (e: any) => {
-        const { name, value } = e.target;
-        setUsuario(prevState => ({
-            ...prevState,
-            [name]: value
-        }));
-    };
+    const [nome, setNome] = useState("")
+    const [identificador, setIdentificador] = useState("")
+    const [documento, setDocumento] = useState("")
+    const [email, setEmail] = useState("")
+    const [telefoneCelular, setTelefone] = useState("")
+    const [tipoPerfil, setTipoPerfil] = useState("")
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            const ses = await getSession();
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/User/Perfil`, {
+                    method: 'GET',
+                    headers: {
+                        authorization: `Bearer ${ses?.user.token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    if (data.documentoFederal.length <= 11) {
+                        data.documentoFederal = formatCPF(data.documentoFederal);
+                    } else {
+                        data.documentoFederal = formatCNPJ(data.documentoFederal);
+                    }
+                    var item = data
+                    setNome(item.nome)
+                    setIdentificador(item.identificador)
+                    setDocumento(item.documentoFederal)
+                    setEmail(item.email)
+                    setTelefone(item.telefoneCelular)
+                    setTipoPerfil(item.tipoPerfil)
+                } else {
+                    const data = await response.json();
+                    toast(data.detail || data.message, { type: 'error', autoClose: 2000 })
+                }
+            } catch (error: any) {
+                toast(error.detail || error.message, { type: 'error', autoClose: 2000 })
+            }
+        };
+
+        fetchUserData();
+    }, []);
 
     const handleSubmit = async (e: any) => {
+        const ses = await getSession();
+
         e.preventDefault();
-        // Implement your update logic here
-        console.log('Updated user info:', usuario);
-        // Redirect after submit or show notification
-        router.push('/some-page'); // Change '/some-page' to where you want to redirect after submit
+        try {
+            let req = {
+                nome: nome,
+                identificador: identificador,
+                email: email,
+                telefoneCelular: telefoneCelular,
+                documentoFederal: documento,
+                tipoPerfil: tipoPerfil
+            }
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user`, {
+                method: 'PUT',
+                headers: {
+                    authorization: `Bearer ${ses?.user.token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(req),
+            });
+
+            if (response.ok) {
+                toast(`Perfil atualizado com sucesso!`, { type: 'success', autoClose: 2000 })
+            } else {
+                const data = await response.json();
+                toast(data.detail || data.message, { type: 'error', autoClose: 2000 })
+            }
+        } catch (error: any) {
+            toast(error.detail || error.message, { type: 'error', autoClose: 2000 })
+        }
     };
+
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -37,90 +98,24 @@ export default function Perfil() {
                 <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Editar Perfil</h2>
                 <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
                     <div className="rounded-md shadow-sm -space-y-px">
+                        <Input type="text" label="Nome" value={nome} onChange={(e: any) => setNome(e.target.value)} />
+
+                        <Input type="text" label="Identificador" value={identificador} onChange={(e: any) => setIdentificador(e.target.value)} />
+
+                        <Input type="text" label="Documento Federal" isDisabled value={documento} onChange={(e: any) => setDocumento(e.target.value)} />
+
+                        <Input type="text" label="Email" value={email} onChange={(e: any) => setEmail(e.target.value)} />
+
+                        <Input type="text" label="Telefone" value={telefoneCelular} onChange={(e: any) => setTelefone(e.target.value)} />
+
                         <div>
-                            <label htmlFor="nome" className="sr-only">Nome completo</label>
-                            <input
-                                id="nome"
-                                name="Nome"
-                                type="text"
-                                required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                                placeholder="Nome"
-                                value={usuario.Nome}
-                                onChange={handleChange}
-                            />
+                            <button
+                                type="submit"
+                                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            >
+                                Atualizar Perfil
+                            </button>
                         </div>
-                        <div>
-                            <label htmlFor="identificador" className="sr-only">Apelido</label>
-                            <input
-                                id="identificador"
-                                name="Identificador"
-                                type="text"
-                                required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                                placeholder="Identificador"
-                                value={usuario.Identificador}
-                                onChange={handleChange}
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="email" className="sr-only">E-mail</label>
-                            <input
-                                id="email"
-                                name="Email"
-                                type="email"
-                                required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                                placeholder="Email"
-                                value={usuario.Email}
-                                onChange={handleChange}
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="telefoneCelular" className="sr-only">Telefone Celular</label>
-                            <input
-                                id="telefoneCelular"
-                                name="TelefoneCelular"
-                                type="tel"
-                                required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                                placeholder="Telefone Celular"
-                                value={usuario.TelefoneCelular}
-                                onChange={handleChange}
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="documentoFederal" className="sr-only">Documento Federal</label>
-                            <input
-                                id="documentoFederal"
-                                name="DocumentoFederal"
-                                type="text"
-                                required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                                placeholder="Documento Federal (CPF/CNPJ)"
-                                value={usuario.DocumentoFederal}
-                                onChange={handleChange}
-                            />
-                        </div>
-                    </div>
-                    <fieldset className="space-y-1">
-                        <legend className="sr-only">Informações fixas</legend>
-                        <div>
-                            <span className="block text-sm font-medium text-gray-700">Tipo de Perfil:</span>
-                            <span className="block text-sm">{usuario.TipoPerfil}</span>
-                        </div>
-                        <div>
-                            <span className="block text-sm font-medium text-gray-700">Situação:</span>
-                            <span className="block text-sm">{usuario.Situacao}</span>
-                        </div>
-                    </fieldset>
-                    <div>
-                        <button
-                            type="submit"
-                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                        >
-                            Atualizar Perfil
-                        </button>
                     </div>
                 </form>
             </div>
