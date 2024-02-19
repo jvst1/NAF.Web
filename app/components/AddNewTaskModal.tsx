@@ -204,8 +204,29 @@ export default function AddNewTaskModal({
     setRefreshFileKey(oldKey => oldKey + 1)
   }
 
-  function downloadFile(file: any) {
-    console.log('baixou', file)
+  async function downloadFile(file: any) {
+    const session = await getSession();
+
+    fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/Chamado/${file.codigoChamado}/Documento/${file.codigo}/Download`,
+      {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${session?.user.token}`
+        },
+      }
+    ).then(async (res) => {
+      saveByteArray(file.nomeArquivo, res)
+    });
+  }
+
+  function saveByteArray(reportName: any, byte: any) {
+    var blob = new Blob([byte], { type: "application/pdf" });
+    var link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    var fileName = reportName;
+    link.download = fileName;
+    link.click();
   }
 
   async function deleteFile(file: any) {
@@ -445,20 +466,23 @@ export default function AddNewTaskModal({
                               Enviar
                             </Button>
                           </div>
-                          <div className="bg-white rounded-lg p-4 overflow-y-scroll">
-                            {
-                              comments.map((comment: any, index: any) => (
-                                <div key={index} className="flex gap-4 items-center">
-                                  <Avatar />
+                          {
+                            comments.length > 0 &&
+                            <div className="bg-white rounded-lg p-4 overflow-y-scroll">
+                              {
+                                comments.map((comment: any, index: any) => (
+                                  <div key={index} className="flex gap-4 items-center">
+                                    <Avatar />
 
-                                  <div className="flex flex-col">
-                                    <span>{comment.usuario.nome}</span>
-                                    <span className="text-sm">{comment.mensagem}</span>
+                                    <div className="flex flex-col">
+                                      <span>{comment.usuario.nome}</span>
+                                      <span className="text-sm">{comment.mensagem}</span>
+                                    </div>
                                   </div>
-                                </div>
-                              ))
-                            }
-                          </div>
+                                ))
+                              }
+                            </div>
+                          }
                         </Card>
                       </>
                     ) : (
@@ -538,10 +562,13 @@ export default function AddNewTaskModal({
                                   <div>
                                     <strong>Nome:</strong> {file.name || file.nomeArquivo}
                                   </div>
-                                  <div>
-                                    <strong>Tamanho:</strong>{" "}
-                                    {(file.size / 1024).toFixed(2)} KB
-                                  </div>
+                                  {
+                                    file.size &&
+                                    <div>
+                                      <strong>Tamanho:</strong>{" "}
+                                      {(file.size / 1024).toFixed(2)} KB
+                                    </div>
+                                  }
                                 </div>
 
                                 <div className="flex gap-2 mr-4">

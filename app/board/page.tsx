@@ -8,11 +8,20 @@ import {
   DropResult,
   Droppable,
 } from "react-beautiful-dnd";
-
-import { Data, cardsData } from "./teste";
 import { toast } from "react-toastify";
 import { useDisclosure } from "@nextui-org/react";
 import AddNewTaskModal from "../components/AddNewTaskModal";
+
+interface Data {
+  id: number;
+  title: string;
+  components: {
+    codigo: number;
+    titulo: string;
+    descricao: string;
+  }[];
+}
+
 
 export default function Home() {
   const [data, setData] = useState<Data[] | []>([]);
@@ -31,6 +40,24 @@ export default function Home() {
   });
 
   useEffect(() => {
+    let cardsData: Data[] = [
+      {
+        id: 0,
+        title: "Pendente",
+        components: [],
+      },
+      {
+        id: 1,
+        title: "Em andamento",
+        components: [],
+      },
+      {
+        id: 2,
+        title: "Concluído",
+        components: [],
+      },
+    ]
+
     const getData = async () => {
       const ses = await getSession();
 
@@ -60,36 +87,54 @@ export default function Home() {
   }
 
   const onDragEnd = (e: DropResult) => {
-    if (e.destination?.droppableId === e.source.droppableId) return;
+    if (!e.destination) {
+      return;
+    }
 
-    var req = {
-      situacao: e.destination?.droppableId,
-    };
+    const { source, destination, draggableId } = e;
 
-    fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/Chamado/` +
-      e.draggableId +
-      "/Situacao",
-      {
-        method: "PUT",
-        body: JSON.stringify(req),
-        headers: {
-          authorization: `Bearer ${session?.user.token}`,
-          "Content-Type": "application/json",
-        },
+    const sourceCard = data.find(card => card.id.toString() === source.droppableId);
+    const destinationCard = data.find(card => card.id.toString() === destination.droppableId);
+
+    if (sourceCard && destinationCard) {
+      const draggedComponent = sourceCard.components.find(comp => comp.codigo.toString() === draggableId);
+
+      if (draggedComponent) {
+        sourceCard.components = sourceCard.components.filter(comp => comp.codigo.toString() !== draggableId);
+
+        destinationCard.components.splice(destination.index, 0, draggedComponent);
+
+        data[sourceCard.id] = sourceCard
+        data[destinationCard.id] = destinationCard
+
+        var req = {
+          situacao: destination.droppableId,
+        };
+
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/Chamado/${draggableId}/Situacao`,
+          {
+            method: "PUT",
+            body: JSON.stringify(req),
+            headers: {
+              authorization: `Bearer ${session?.user.token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        ).then((res) => {
+          if (res.ok) {
+            toast('Atualizado com sucesso.', { type: 'success', autoClose: 2000 })
+          } else {
+            const data = res.json()
+
+            data.then((error) => {
+              toast(error.mensagem, { type: 'error', autoClose: 2000 })
+            })
+          }
+        })
+
+        setData(data)
       }
-    ).then((res) => {
-      if (res.ok) {
-        refresh();
-      } else {
-        const data = res.json();
-
-        data.then((error) => {
-          toast(error.mensagem, { type: "error", autoClose: 2000 });
-        });
-      }
-    });
-    console.log(e);
+    }
   };
 
   const getServicos = async () => {
