@@ -117,7 +117,7 @@ export default function TableOperadores({
   }
 
   function formatSituacao(situacao: any) {
-    return situacoes.find((item) => item.value === situacao).text;
+    return situacoes.find((item) => item.value === situacao)?.text;
   }
 
   return (

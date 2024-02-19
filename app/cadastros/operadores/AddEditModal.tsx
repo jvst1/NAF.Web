@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react'
 
 import { Button, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Select, SelectItem } from "@nextui-org/react";
-import { situacoes, tiposPerfil } from '@/app/src/utils/enums'
+import { toast } from 'react-toastify';
+import { getSession } from 'next-auth/react';
+import { formatCNPJ, formatCPF, isValidEmail, isValidPhone } from '@brazilian-utils/brazilian-utils';
+import { clearCpfCnpj } from '@/app/src/utils/clearDocument';
 
 export default function AddEditModal({ refresh, isOpen, onOpenChange, item }: any) {
     const [nome, setNome] = useState("")
@@ -10,18 +13,78 @@ export default function AddEditModal({ refresh, isOpen, onOpenChange, item }: an
     const [email, setEmail] = useState("")
     const [telefoneCelular, setTelefone] = useState("")
     const [tipoPerfil, setTipoPerfil] = useState("")
-    const [situacao, setSituacao] = useState("")
 
     const handleSelectionTipoPerfil = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setTipoPerfil(e.target.value);
     };
 
-    const handleSelectionSituacao = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setSituacao(e.target.value);
-    };
-
     async function submit(closeModal: any) {
-        closeModal()
+        if (!validarRequest()) return;
+
+        const session = await getSession();
+
+        let req = {
+            name: nome,
+            email: email,
+            phoneNumber: telefoneCelular,
+            documentoFederal: documento,
+            password: "",
+            apelido: identificador,
+            tipoPerfil: parseInt(tipoPerfil)
+        };
+
+        if (item.codigo) {
+            fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/User/` + item.codigo,
+                {
+                    method: "PUT",
+                    body: JSON.stringify(req),
+                    headers: {
+                        authorization: `Bearer ${session?.user.token}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            ).then((res) => {
+                if (res.ok) {
+                    toast("Usuario atualizado com sucesso.", {
+                        type: "success",
+                        autoClose: 2000,
+                    });
+                    refresh();
+                    closeModal();
+                } else {
+                    const data = res.json();
+
+                    data.then((error) => {
+                        toast(error.mensagem, { type: "error", autoClose: 2000 });
+                    });
+                }
+            });
+        } else {
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/User/Operador/register`, {
+                method: "POST",
+                body: JSON.stringify(req),
+                headers: {
+                    authorization: `Bearer ${session?.user.token}`,
+                    "Content-Type": "application/json",
+                },
+            }).then((res) => {
+                if (res.ok) {
+                    toast("Usuario criado com sucesso.", {
+                        type: "success",
+                        autoClose: 2000,
+                    });
+                    refresh();
+                    closeModal();
+                } else {
+                    const data = res.json();
+
+                    data.then((error) => {
+                        toast(error.mensagem || error.detail, { type: "error", autoClose: 2000 });
+                    });
+                }
+            });
+        }
     }
 
     useEffect(() => {
@@ -32,9 +95,37 @@ export default function AddEditModal({ refresh, isOpen, onOpenChange, item }: an
             setEmail(item.email)
             setTelefone(item.telefoneCelular)
             setTipoPerfil(item.tipoPerfil.toString())
-            setSituacao(item.situacao.toString())
         }
     }, [item])
+
+    const tiposPerfil: any[] = [
+        { text: "Universitário", value: 2 },
+        { text: "Professor", value: 4 },
+    ];
+
+    function validarRequest() {
+        if (!isValidEmail(email)) {
+            toast("O email informado é inválido.", {
+                hideProgressBar: true,
+                autoClose: 2000,
+                type: "error",
+            });
+
+            return false;
+        }
+
+        if (!isValidPhone(telefoneCelular)) {
+            toast("O telefone informado é inválido.", {
+                hideProgressBar: true,
+                autoClose: 2000,
+                type: "error",
+            });
+
+            return false;
+        }
+
+        return true
+    }
 
     return (
         <>
@@ -48,7 +139,17 @@ export default function AddEditModal({ refresh, isOpen, onOpenChange, item }: an
 
                                 <Input type="text" label="Identificador" value={identificador} onChange={(e: any) => setIdentificador(e.target.value)} />
 
-                                <Input type="text" label="Documento Federal" value={documento} onChange={(e: any) => setDocumento(e.target.value)} />
+                                <Input type="text" label="Documento Federal" value={documento} onChange={(e: any) => {
+                                    const { value } = e.target;
+
+                                    let doc = clearCpfCnpj(value)
+
+                                    if (doc.length <= 11) {
+                                        setDocumento(formatCPF(value));
+                                    } else {
+                                        setDocumento(formatCNPJ(value))
+                                    }
+                                }} />
 
                                 <Input type="text" label="Email" value={email} onChange={(e: any) => setEmail(e.target.value)} />
 
@@ -63,19 +164,6 @@ export default function AddEditModal({ refresh, isOpen, onOpenChange, item }: an
                                     {tiposPerfil.map((tipoPerfil) => (
                                         <SelectItem key={tipoPerfil.value} value={tipoPerfil.value}>
                                             {tipoPerfil.text}
-                                        </SelectItem>
-                                    ))}
-                                </Select>
-
-                                <Select
-                                    label="Situação"
-                                    placeholder="Selecione"
-                                    selectedKeys={situacao}
-                                    onChange={handleSelectionSituacao}
-                                >
-                                    {situacoes.map((situacao) => (
-                                        <SelectItem key={situacao.value} value={situacao.value}>
-                                            {situacao.text}
                                         </SelectItem>
                                     ))}
                                 </Select>
