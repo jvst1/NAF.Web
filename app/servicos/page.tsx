@@ -35,7 +35,16 @@ export default function Home() {
         return acc;
     }, {});
 
-    const filteredAreas = areas.filter(area => servicesCountByArea[area.codigo] > 1);
+    const filteredAreas = areas.filter(area => servicesCountByArea[area.codigo] >= 1);
+
+    function formatResponse(response: string): JSX.Element[] {
+        return response.split('\n').map((item, index) => (
+            <React.Fragment key={index}>
+                {item}
+                {index !== response.split('\n').length - 1 && <br />}
+            </React.Fragment>
+        ));
+    }
 
     return (
         <div className="flex">
@@ -62,7 +71,7 @@ export default function Home() {
                     <Card className="bg-gray-200 shadow rounded">
                         <CardBody>
                             <h1 className="text-lg font-bold">{selectedService.nome}</h1>
-                            <p>{selectedService.descricao}</p>
+                            <p>{formatResponse(selectedService.descricao)}</p>
                         </CardBody>
                     </Card>
                 ) : (

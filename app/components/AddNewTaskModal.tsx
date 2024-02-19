@@ -317,7 +317,7 @@ export default function AddNewTaskModal({
 
       if (operadores?.length > 0) {
         var operador: any = operadores.find((operador: any) => operador.codigo === item.codigoOperador);
-        
+
         setOperador(operador?.id?.toString());
       } else {
         setOperador(item?.operador?.nome)
@@ -434,7 +434,7 @@ export default function AddNewTaskModal({
                             Descrição
                             <Textarea
                               disableAutosize
-                              isDisabled
+                              isReadOnly
                               className="w-full mt-4"
                               classNames={{
                                 input: "resize-y min-h-[200px]",
@@ -522,7 +522,7 @@ export default function AddNewTaskModal({
                               Descrição
                               <Textarea
                                 disableAutosize
-                                isDisabled
+                                isReadOnly
                                 className="w-full mt-4 h-full"
                                 classNames={{
                                   input: "resize-y min-h-[200px] max-h-[400px]",

@@ -117,7 +117,7 @@ export default function AddEditModal({
 
   return (
     <>
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} isDismissable={false}>
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} isDismissable={false} size="4xl">
         <ModalContent>
           {(onClose) => (
             <>
