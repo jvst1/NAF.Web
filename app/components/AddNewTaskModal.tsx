@@ -18,6 +18,7 @@ import {
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { getSession, useSession } from "next-auth/react";
+import { format } from "date-fns";
 
 export default function AddNewTaskModal({
   isOpen,
@@ -293,7 +294,7 @@ export default function AddNewTaskModal({
           setComments([])
         }
       };
-
+      
       const getDocumentos = async () => {
         const session = await getSession();
 
@@ -461,16 +462,15 @@ export default function AddNewTaskModal({
                             />
                           </div>
                         </Card>
-                        <Card className="bg-gray-200 h-1/2 gap-4 p-4 flex flex-col overflow-y-scroll">
-                          <div className="bg-white h-1/3 rounded-lg p-4 flex items-center gap-4">
-                            <Avatar />
+                        <Card className="bg-gray-200 h-1/2 gap-4 p-4 flex flex-col overflow-y-auto">
+                          <div className="bg-white rounded-lg p-4 flex items-center gap-4 shadow">
+                            <Avatar /> { }
 
                             <Textarea
-                              disableAutosize
                               label="Comentar"
-                              className="w-full mt-4 h-full"
+                              className="w-full h-full"
                               classNames={{
-                                input: "resize-y  min-h-[30px] max-h-[30px]",
+                                label: "text-sm font-medium text-gray-700",
                               }}
                               value={comment}
                               onChange={(e: any) => setComment(e.target.value)}
@@ -479,29 +479,32 @@ export default function AddNewTaskModal({
                             <Button
                               color="primary"
                               onPress={(e: any) => comentar(item.codigo)}
+                              className="self-end"
                             >
                               Enviar
                             </Button>
                           </div>
-                          {
-                            comments.length > 0 &&
-                            <div className="flex flex-col gap-4">
-                              {
-                                comments.map((comment: any, index: any) => (
-                                  <div key={index} className="bg-white rounded-lg p-4 overflow-y-scroll">
-                                    <div className="flex gap-4 items-center">
-                                      <Avatar />
+                          {comments.length > 0 && (
+                            <div className="flex flex-col gap-4 overflow-y-auto mt-4">
+                              {comments.map((comment: any, index: any) => (
+                                <div key={index} className="bg-white rounded-lg p-4 shadow-md max-h-60">
+                                  <div className="flex gap-4 items-start">
+                                    <div className="shrink-0">
+                                      <Avatar /> { }
+                                    </div>
 
-                                      <div className="flex flex-col">
-                                        <span>{comment.usuario.nome}</span>
-                                        <span className="text-sm">{comment.mensagem}</span>
+                                    <div className="flex flex-col">
+                                      <div className="flex items-baseline gap-2">
+                                        <span className="font-semibold">{comment.usuario.nome}</span>
+                                        <span className="text-xs text-gray-500">{format(new Date(comment.dtInclusao), 'dd/MM/yyyy HH:mm:ss')}</span>
                                       </div>
+                                      <span className="text-sm mt-1">{comment.mensagem}</span>
                                     </div>
                                   </div>
-                                ))
-                              }
+                                </div>
+                              ))}
                             </div>
-                          }
+                          )}
                         </Card>
                       </>
                     ) : (
