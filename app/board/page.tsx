@@ -34,20 +34,22 @@ export default function Home() {
     const getData = async () => {
       const ses = await getSession();
 
-      const query = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Chamado`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Chamado`, {
         headers: {
           authorization: `Bearer ${ses?.user.token}`,
           "Content-Type": "application/json",
         },
       });
 
-      const response = await query.json();
+      if (res.ok && res.status === 200) {
+        const response = await res.json()
 
-      response.map((item: any) => {
-        cardsData[item.situacao].components.push(item);
-      });
+        response.map((item: any) => {
+          cardsData[item.situacao].components.push(item);
+        });
+      }
 
-      setData(cardsData);
+      setData(cardsData)
     };
 
     getData();
@@ -66,8 +68,8 @@ export default function Home() {
 
     fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/Chamado/` +
-        e.draggableId +
-        "/Situacao",
+      e.draggableId +
+      "/Situacao",
       {
         method: "PUT",
         body: JSON.stringify(req),

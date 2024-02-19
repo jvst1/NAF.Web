@@ -13,6 +13,7 @@ import {
   Button,
   ModalFooter,
   Image,
+  Tooltip,
 } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
@@ -23,19 +24,26 @@ export default function AddNewTaskModal({
   onOpenChange,
   refresh,
   item,
-  servicos,
+  servicos
 }: any) {
   const [situacao, setSituacao] = useState("");
   const [area, setArea] = useState("");
   const [servico, setServico] = useState("");
   const [solicitante, setSolicitante] = useState("");
 
+  const [operador, setOperador] = useState("");
+  const [operadores, setOperadores] = useState<[]>([]);
+
   const [comment, setComment] = useState("");
+  const [comments, setComments] = useState<[]>([]);
 
   const [titulo, setTitulo] = useState("");
   const [descricao, setDescricao] = useState("");
 
   const [files, setFiles] = useState([]);
+
+  const [refreshCommentKey, setRefreshCommentKey] = useState(0);
+  const [refreshFileKey, setRefreshFileKey] = useState(0);
 
   const handleFileChange = (event: any) => {
     setFiles(Array.from(event.target.files));
@@ -50,44 +58,47 @@ export default function AddNewTaskModal({
     setSituacao(e.target.value);
   };
 
-  //   async function submitFiles(taskId: any) {
-  //     if (!file) return;
+  const handleSelectionOperadores = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setOperador(e.target.value)
+  };
 
-  //     const session = await getSession();
+  async function submitFiles(taskId: any) {
+    if (!files) return;
 
-  //     try {
-  //       const formData = new FormData();
+    files.forEach(async (file) => {
+      const session = await getSession();
 
-  //       formData.append("file", file);
+      try {
+        const formData = new FormData();
 
-  //       var codigoUsuario = session?.user.id ?? "";
-  //       formData.append("codigoUsuario", codigoUsuario);
+        formData.append("file", file);
 
-  //       fetch(`${process.env.NEXT_PUBLIC_API_URL}/Chamado/${taskId}/Documento`, {
-  //         method: "POST",
-  //         body: formData,
-  //         headers: {
-  //           authorization: `Bearer ${session?.user.token}`,
-  //         },
-  //       });
-  //     } catch (e: any) {
-  //       console.log(e);
-  //     }
-  //   }
+        var codigoUsuario = session?.user.id ?? "";
+        formData.append("codigoUsuario", codigoUsuario);
+
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/Chamado/${taskId}/Documento`, {
+          method: "POST",
+          body: formData,
+          headers: {
+            authorization: `Bearer ${session?.user.token}`,
+          },
+        });
+      } catch (e: any) {
+        console.log(e);
+      }
+    })
+  }
 
   async function submit(closeModal: any) {
     const session = await getSession();
 
-    const codigoServico = servicos[servico].codigo;
-
-    let req = {
-      codigoUsuario: session?.user.id,
-      codigoServico: codigoServico,
-      titulo: titulo,
-      descricao: descricao,
-    };
-
     if (item.codigo) {
+      const codigoOperador: any = operadores[parseInt(operador)];
+
+      let req = {
+        codigoOperador: codigoOperador.codigo
+      };
+
       fetch(`${process.env.NEXT_PUBLIC_API_URL}/Chamado/` + item.codigo, {
         method: "PUT",
         body: JSON.stringify(req),
@@ -99,7 +110,7 @@ export default function AddNewTaskModal({
         const data = await res.json();
 
         if (res.ok) {
-          //   submitFiles(item.codigo);
+          submitFiles(item.codigo);
           toast("Chamado atualizado com sucesso.", {
             type: "success",
             autoClose: 2000,
@@ -113,6 +124,15 @@ export default function AddNewTaskModal({
         }
       });
     } else {
+      const codigoServico = servicos[servico].codigo;
+
+      let req = {
+        codigoUsuario: session?.user.id,
+        codigoServico: codigoServico,
+        titulo: titulo,
+        descricao: descricao,
+      };
+
       fetch(`${process.env.NEXT_PUBLIC_API_URL}/Chamado`, {
         method: "POST",
         body: JSON.stringify(req),
@@ -124,7 +144,7 @@ export default function AddNewTaskModal({
         const data = await res.json();
 
         if (res.ok) {
-          //   submitFiles(data.codigo);
+          submitFiles(data.codigo);
           toast("Chamado criada com sucesso.", {
             type: "success",
             autoClose: 2000,
@@ -138,6 +158,10 @@ export default function AddNewTaskModal({
         }
       });
     }
+  }
+
+  function refreshComments() {
+    setRefreshCommentKey(oldKey => oldKey + 1)
   }
 
   async function comentar(taskId: any) {
@@ -161,19 +185,49 @@ export default function AddNewTaskModal({
     ).then(async (res) => {
       const data = await res.json();
 
-      if (res.ok) {
+      if (res.ok && res.status === 200) {
         toast("Comentário anexado com sucesso.", {
           type: "success",
           autoClose: 2000,
         });
         setComment("")
-        refresh();
+        refreshComments();
       } else {
         data.then((error: any) => {
           toast(error.mensagem, { type: "error", autoClose: 2000 });
         });
       }
     });
+  }
+
+  function refreshFiles() {
+    setRefreshFileKey(oldKey => oldKey + 1)
+  }
+
+  function downloadFile(file: any) {
+    console.log('baixou', file)
+  }
+
+  async function deleteFile(file: any) {
+    const session = await getSession()
+
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/Chamado/${file.codigoChamado}/Documento/${file.codigo}`, {
+      method: 'DELETE',
+      headers: {
+        authorization: `Bearer ${session?.user.token}`
+      }
+    }).then((res) => {
+      if (res.ok) {
+        toast('Arquivo removido com sucesso', { type: 'success', autoClose: 2000 })
+        refreshFiles()
+      } else {
+        const data = res.json()
+
+        data.then((error) => {
+          toast(error.mensagem, { type: 'error', autoClose: 2000 })
+        })
+      }
+    })
   }
 
   useEffect(() => {
@@ -191,10 +245,36 @@ export default function AddNewTaskModal({
         setArea(servico[0]?.area.nome);
       }
 
+      const getOperadores = async () => {
+        const ses = await getSession()
+
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/User/Operador`, {
+          headers: {
+            authorization: `Bearer ${ses?.user.token}`,
+            'Content-Type': 'application/json',
+          }
+        })
+
+        if (res.ok && res.status === 200) {
+          const response = await res.json()
+
+          let id = 0
+          response.map((op: any) => {
+            op.id = id
+            id++
+          })
+
+          setOperadores(response)
+        } else {
+          setOperadores([])
+        }
+      }
+      getOperadores()
+
       const getComentarios = async () => {
         const session = await getSession();
 
-        const query = await fetch(
+        const res = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/Chamado/${item.codigo}/Comentario`,
           {
             headers: {
@@ -204,14 +284,39 @@ export default function AddNewTaskModal({
           }
         );
 
-        const response = await query.json();
+        if (res.ok && res.status === 200) {
+          const response = await res.json();
 
-        console.log(response);
+          setComments(response)
+        } else {
+          setComments([])
+        }
       };
 
+      const getDocumentos = async () => {
+        const session = await getSession();
+
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/Chamado/${item.codigo}/Documento`,
+          {
+            headers: {
+              authorization: `Bearer ${session?.user.token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (res.ok && res.status === 200) {
+          const response = await res.json();
+
+          setFiles(response)
+        }
+      };
+
+      getDocumentos();
       getComentarios();
     }
-  }, [item, servicos]);
+  }, [item, servicos, refreshCommentKey, refreshFileKey]);
 
   const situacoes: any[] = [
     { name: "Pendente", value: 0 },
@@ -266,6 +371,13 @@ export default function AddNewTaskModal({
                                 value={area}
                                 isDisabled
                               />
+
+                              <Input
+                                type="text"
+                                label="Serviço"
+                                value={servico}
+                                isDisabled
+                              />
                             </div>
                             <div className="flex gap-4">
                               <Input
@@ -278,12 +390,21 @@ export default function AddNewTaskModal({
                                 }
                               />
 
-                              <Input
-                                type="text"
-                                label="Serviço"
-                                value={servico}
-                                isDisabled
-                              />
+                              <Select
+                                label="Operador"
+                                placeholder="Selecione"
+                                selectedKeys={operador}
+                                onChange={handleSelectionOperadores}
+                              >
+                                {operadores.map((operador: any) => (
+                                  <SelectItem
+                                    key={operador.id}
+                                    value={operador.id}
+                                  >
+                                    {operador.nome}
+                                  </SelectItem>
+                                ))}
+                              </Select>
                             </div>
                           </div>
                           <div className="m-4 bg-white rounded-lg p-4 h-full">
@@ -302,7 +423,7 @@ export default function AddNewTaskModal({
                             />
                           </div>
                         </Card>
-                        <Card className="bg-gray-200 h-1/2 gap-4 p-4 flex flex-col justify-between">
+                        <Card className="bg-gray-200 h-1/2 gap-4 p-4 flex flex-col">
                           <div className="bg-white h-1/3 rounded-lg p-4 flex items-center gap-4">
                             <Avatar />
 
@@ -324,10 +445,19 @@ export default function AddNewTaskModal({
                               Enviar
                             </Button>
                           </div>
-                          <div className="bg-white h-full rounded-lg p-4 overflow-y-scroll">
-                            <div className="bg-white h-1/3 rounded-lg flex items-center">
-                              <Avatar />
-                            </div>
+                          <div className="bg-white rounded-lg p-4 overflow-y-scroll">
+                            {
+                              comments.map((comment: any, index: any) => (
+                                <div key={index} className="flex gap-4 items-center">
+                                  <Avatar />
+
+                                  <div className="flex flex-col">
+                                    <span>{comment.usuario.nome}</span>
+                                    <span className="text-sm">{comment.mensagem}</span>
+                                  </div>
+                                </div>
+                              ))
+                            }
                           </div>
                         </Card>
                       </>
@@ -383,31 +513,52 @@ export default function AddNewTaskModal({
 
                   <Card className="col-span-4 bg-gray-200">
                     <CardBody>
-                      <div className="m-1 bg-white rounded-lg p-4 h-full">
+                      <div className="m-1 bg-white rounded-lg p-4 h-full overflow-y-scroll">
                         Anexar Documentos
-                        <input
-                          type="file"
-                          multiple
-                          onChange={handleFileChange}
-                        />
+                        <label className="flex flex-col">
+                          <input
+                            type="file"
+                            multiple
+                            onChange={handleFileChange}
+                          />
+                        </label>
                         <ul className="file-list">
                           {files.map((file: any, index) => (
                             <li key={index} className="file-item">
                               {/* If the file is an image, display a preview */}
-                              {file.type.startsWith("image/") && (
+                              {file?.type?.startsWith("image/") && (
                                 <Image
                                   src={URL.createObjectURL(file)}
                                   alt="Preview"
                                   className="img-preview"
                                 />
                               )}
-                              <div className="file-details">
+                              <div className="file-details w-full flex justify-between items-center">
                                 <div>
-                                  <strong>Nome:</strong> {file.name}
+                                  <div>
+                                    <strong>Nome:</strong> {file.name || file.nomeArquivo}
+                                  </div>
+                                  <div>
+                                    <strong>Tamanho:</strong>{" "}
+                                    {(file.size / 1024).toFixed(2)} KB
+                                  </div>
                                 </div>
-                                <div>
-                                  <strong>Tamanho:</strong>{" "}
-                                  {(file.size / 1024).toFixed(2)} KB
+
+                                <div className="flex gap-2 mr-4">
+                                  <Tooltip content="Baixar">
+                                    <div onClick={(e) => downloadFile(file)}>
+                                      <span className="material-symbols-outlined cursor-pointer">
+                                        download
+                                      </span>
+                                    </div>
+                                  </Tooltip>
+                                  <Tooltip content="Remover">
+                                    <div onClick={(e) => deleteFile(file)}>
+                                      <span className="material-symbols-outlined cursor-pointer">
+                                        close
+                                      </span>
+                                    </div>
+                                  </Tooltip>
                                 </div>
                               </div>
                             </li>

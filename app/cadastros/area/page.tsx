@@ -26,16 +26,20 @@ export default function Area() {
         const getData = async () => {
             const ses = await getSession()
 
-            const query = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Area`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Area`, {
                 headers: {
                     authorization: `Bearer ${ses?.user.token}`,
                     'Content-Type': 'application/json',
                 }
             })
 
-            const response = await query.json()
+            if (res.ok && res.status === 200) {
+                const response = await res.json()
 
-            setItems(response)
+                setItems(response)
+            } else {
+                setItems([])
+            }
         }
         getData()
     }, [refreshKey])
@@ -49,7 +53,7 @@ export default function Area() {
         var servico: Area = {
             codigo: "",
             nome: ""
-            
+
         }
         setItem(servico)
         onOpen()

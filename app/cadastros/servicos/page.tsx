@@ -27,15 +27,20 @@ export default function Servicos() {
         const getData = async () => {
             const ses = await getSession()
 
-            const query = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Servico`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Servico`, {
                 headers: {
                     authorization: `Bearer ${ses?.user.token}`,
                     'Content-Type': 'application/json',
                 }
             })
 
-            const response = await query.json()
-            setItems(response)
+            if (res.ok && res.status === 200) {
+                const response = await res.json()
+
+                setItems(response)
+            } else {
+                setItems([])
+            }
         }
         getData()
     }, [refreshKey])
