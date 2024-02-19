@@ -14,13 +14,6 @@ export const authOptions: NextAuthOptions = {
                     password: credentials?.password
                 }
 
-                return {
-                    id: 1,
-                    email: "Fleisons",
-                    token: "asdasd",
-                    tipoPerfil: 4
-                }
-
                 var res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Auth/login`, {
                     method: 'POST',
                     body: JSON.stringify(request),
