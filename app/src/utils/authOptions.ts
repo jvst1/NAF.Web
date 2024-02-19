@@ -32,8 +32,6 @@ export const authOptions: NextAuthOptions = {
                         token: data.token,
                         tipoPerfil: data.tipoPerfil
                     }
-                } else {
-                    throw Error(data.mensagem || data.detail)
                 }
 
                 return null
