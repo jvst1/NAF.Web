@@ -55,6 +55,12 @@ export default function Servicos() {
 
         const response = await query.json()
 
+        let id = 0
+        response.map((op: any) => {
+            op.id = id
+            id++
+        })
+
         setAreas(response)
     }
 

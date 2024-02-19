@@ -9,7 +9,7 @@ import {
   Droppable,
 } from "react-beautiful-dnd";
 import { toast } from "react-toastify";
-import { useDisclosure } from "@nextui-org/react";
+import { Input, useDisclosure } from "@nextui-org/react";
 import AddNewTaskModal from "../components/AddNewTaskModal";
 
 interface Data {
@@ -26,8 +26,10 @@ interface Data {
 export default function Home() {
   const [data, setData] = useState<Data[] | []>([]);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [servicos, setServicos] = useState<[]>([]);
   const [item, setItem] = useState<{}>();
+
+  const [servicos, setServicos] = useState<[]>([]);
+  const [operadores, setOperadores] = useState<[]>([]);
 
   let { isOpen, onOpen, onOpenChange } = useDisclosure();
 
@@ -165,7 +167,33 @@ export default function Home() {
     setServicos(response);
   };
 
+  const getOperadores = async () => {
+    const ses = await getSession()
+
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/User/Operador`, {
+      headers: {
+        authorization: `Bearer ${ses?.user.token}`,
+        'Content-Type': 'application/json',
+      }
+    })
+
+    if (res.ok && res.status === 200) {
+      const response = await res.json()
+
+      let id = 0
+      response.map((op: any) => {
+        op.id = id
+        id++
+      })
+
+      setOperadores(response)
+    } else {
+      setOperadores([])
+    }
+  }
+
   function openTaskDetails(task: any) {
+    getOperadores()
     getServicos();
     setItem(task);
     onOpen();
@@ -187,7 +215,7 @@ export default function Home() {
                     ref={provided.innerRef}
                   >
                     <h1 className="pt-3 text-lg">{items.title}</h1>
-                    {items.components.map((component, index) => (
+                    {items.components.map((component: any, index) => (
                       <Draggable
                         key={component.codigo.toString()}
                         draggableId={component.codigo.toString()}
@@ -197,16 +225,32 @@ export default function Home() {
                           <div
                             onClick={(e) => openTaskDetails(component)}
                             key={index}
-                            className="bg-white mx-4 rounded-lg text-start p-4 flex flex-col"
+                            className="bg-white mx-4 rounded-lg text-start p-4 flex flex-col gap-4"
                             {...provided.dragHandleProps}
                             {...provided.draggableProps}
                             ref={provided.innerRef}
                           >
                             {component.titulo}
 
-                            <span className="text-sm">
-                              {component.descricao}
-                            </span>
+                            <div className="flex gap-2">
+                              <Input
+                                type="text"
+                                label="Solicitante"
+                                size={"sm"}
+                                variant="bordered"
+                                value={component?.usuario?.nome}
+                                isDisabled
+                              />
+
+                              <Input
+                                type="text"
+                                label="Operador"
+                                size={"sm"}
+                                variant="bordered"
+                                value={component?.operador?.nome}
+                                isDisabled
+                              />
+                            </div>
                           </div>
                         )}
                       </Draggable>
@@ -225,6 +269,7 @@ export default function Home() {
         refresh={refresh}
         item={item}
         servicos={servicos}
+        operadores={operadores}
       ></AddNewTaskModal>
     </main>
   );

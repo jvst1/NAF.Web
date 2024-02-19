@@ -17,14 +17,15 @@ import {
 } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import { getSession } from "next-auth/react";
+import { getSession, useSession } from "next-auth/react";
 
 export default function AddNewTaskModal({
   isOpen,
   onOpenChange,
   refresh,
   item,
-  servicos
+  servicos,
+  operadores
 }: any) {
   const [situacao, setSituacao] = useState("");
   const [area, setArea] = useState("");
@@ -32,7 +33,6 @@ export default function AddNewTaskModal({
   const [solicitante, setSolicitante] = useState("");
 
   const [operador, setOperador] = useState("");
-  const [operadores, setOperadores] = useState<[]>([]);
 
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState<[]>([]);
@@ -40,13 +40,17 @@ export default function AddNewTaskModal({
   const [titulo, setTitulo] = useState("");
   const [descricao, setDescricao] = useState("");
 
-  const [files, setFiles] = useState([]);
+  const [files, setFiles] = useState<any[]>([]);
 
   const [refreshCommentKey, setRefreshCommentKey] = useState(0);
   const [refreshFileKey, setRefreshFileKey] = useState(0);
 
+  const { data: session } = useSession();
+
   const handleFileChange = (event: any) => {
-    setFiles(Array.from(event.target.files));
+    files.push(Array.from(event.target.files))
+
+    setFiles(files);
   };
 
   const handleSelectionServico = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -93,10 +97,10 @@ export default function AddNewTaskModal({
     const session = await getSession();
 
     if (item.codigo) {
-      const codigoOperador: any = operadores[parseInt(operador)];
+      const codigoOperador: any = operadores[operador]?.codigo;
 
       let req = {
-        codigoOperador: codigoOperador.codigo
+        codigoOperador: codigoOperador
       };
 
       fetch(`${process.env.NEXT_PUBLIC_API_URL}/Chamado/` + item.codigo, {
@@ -107,17 +111,17 @@ export default function AddNewTaskModal({
           "Content-Type": "application/json",
         },
       }).then(async (res) => {
-        const data = await res.json();
-
         if (res.ok) {
-          submitFiles(item.codigo);
           toast("Chamado atualizado com sucesso.", {
             type: "success",
             autoClose: 2000,
           });
+          submitFiles(item.codigo);
           refresh();
           closeModal();
         } else {
+          const data = await res.json();
+
           data.then((error: any) => {
             toast(error.mensagem, { type: "error", autoClose: 2000 });
           });
@@ -253,45 +257,6 @@ export default function AddNewTaskModal({
 
   useEffect(() => {
     if (item?.codigo) {
-      setTitulo(item.titulo);
-      setDescricao(item.descricao);
-      setServico(item.servico.nome);
-      setSolicitante(item.usuario.identificador);
-      setSituacao(item.situacao.toString());
-
-      if (servicos.length > 0) {
-        var servico = servicos.filter(
-          (servico: any) => servico.codigo === item.codigoServico
-        );
-        setArea(servico[0]?.area.nome);
-      }
-
-      const getOperadores = async () => {
-        const ses = await getSession()
-
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/User/Operador`, {
-          headers: {
-            authorization: `Bearer ${ses?.user.token}`,
-            'Content-Type': 'application/json',
-          }
-        })
-
-        if (res.ok && res.status === 200) {
-          const response = await res.json()
-
-          let id = 0
-          response.map((op: any) => {
-            op.id = id
-            id++
-          })
-
-          setOperadores(response)
-        } else {
-          setOperadores([])
-        }
-      }
-      getOperadores()
-
       const getComentarios = async () => {
         const session = await getSession();
 
@@ -336,8 +301,32 @@ export default function AddNewTaskModal({
 
       getDocumentos();
       getComentarios();
+
+      setTitulo(item.titulo);
+      setDescricao(item.descricao);
+      setServico(item.servico.nome);
+      setSolicitante(item.usuario.identificador);
+      setSituacao(item.situacao.toString());
+
+      if (servicos.length > 0) {
+        var servico = servicos.filter(
+          (servico: any) => servico.codigo === item.codigoServico
+        );
+        setArea(servico[0]?.area.nome);
+      }
+
+      if (operadores?.length > 0) {
+        var operador: any = operadores.find((operador: any) => operador.codigo === item.codigoOperador);
+        
+        setOperador(operador?.id?.toString());
+      } else {
+        setOperador(item?.operador?.nome)
+      }
+    } else {
+      setTitulo("")
+      setServico("")
     }
-  }, [item, servicos, refreshCommentKey, refreshFileKey]);
+  }, [item, servicos, operadores, refreshCommentKey, refreshFileKey]);
 
   const situacoes: any[] = [
     { name: "Pendente", value: 0 },
@@ -411,21 +400,34 @@ export default function AddNewTaskModal({
                                 }
                               />
 
-                              <Select
-                                label="Operador"
-                                placeholder="Selecione"
-                                selectedKeys={operador}
-                                onChange={handleSelectionOperadores}
-                              >
-                                {operadores.map((operador: any) => (
-                                  <SelectItem
-                                    key={operador.id}
-                                    value={operador.id}
+                              {
+                                session?.user.tipoPerfil !== 1
+                                  ?
+                                  <Select
+                                    label="Operador"
+                                    placeholder="Selecione"
+                                    selectedKeys={operador}
+                                    onChange={handleSelectionOperadores}
+                                    isDisabled={session?.user.tipoPerfil !== 4}
                                   >
-                                    {operador.nome}
-                                  </SelectItem>
-                                ))}
-                              </Select>
+                                    {operadores.map((operador: any, index: any) => (
+                                      <SelectItem
+                                        key={index}
+                                        value={operador.id}
+                                      >
+                                        {operador.nome}
+                                      </SelectItem>
+                                    ))}
+                                  </Select>
+                                  :
+                                  <Input
+                                    type="text"
+                                    label="Operador"
+                                    value={operador}
+                                    isDisabled
+                                  />
+                              }
+
                             </div>
                           </div>
                           <div className="m-4 bg-white rounded-lg p-4 h-full">
@@ -444,7 +446,7 @@ export default function AddNewTaskModal({
                             />
                           </div>
                         </Card>
-                        <Card className="bg-gray-200 h-1/2 gap-4 p-4 flex flex-col">
+                        <Card className="bg-gray-200 h-1/2 gap-4 p-4 flex flex-col overflow-y-scroll">
                           <div className="bg-white h-1/3 rounded-lg p-4 flex items-center gap-4">
                             <Avatar />
 
@@ -468,15 +470,17 @@ export default function AddNewTaskModal({
                           </div>
                           {
                             comments.length > 0 &&
-                            <div className="bg-white rounded-lg p-4 overflow-y-scroll">
+                            <div className="flex flex-col gap-4">
                               {
                                 comments.map((comment: any, index: any) => (
-                                  <div key={index} className="flex gap-4 items-center">
-                                    <Avatar />
+                                  <div key={index} className="bg-white rounded-lg p-4 overflow-y-scroll">
+                                    <div className="flex gap-4 items-center">
+                                      <Avatar />
 
-                                    <div className="flex flex-col">
-                                      <span>{comment.usuario.nome}</span>
-                                      <span className="text-sm">{comment.mensagem}</span>
+                                      <div className="flex flex-col">
+                                        <span>{comment.usuario.nome}</span>
+                                        <span className="text-sm">{comment.mensagem}</span>
+                                      </div>
                                     </div>
                                   </div>
                                 ))
@@ -572,13 +576,16 @@ export default function AddNewTaskModal({
                                 </div>
 
                                 <div className="flex gap-2 mr-4">
-                                  <Tooltip content="Baixar">
-                                    <div onClick={(e) => downloadFile(file)}>
-                                      <span className="material-symbols-outlined cursor-pointer">
-                                        download
-                                      </span>
-                                    </div>
-                                  </Tooltip>
+                                  {
+                                    file.arquivo &&
+                                    <Tooltip content="Baixar">
+                                      <div onClick={(e) => downloadFile(file)}>
+                                        <span className="material-symbols-outlined cursor-pointer">
+                                          download
+                                        </span>
+                                      </div>
+                                    </Tooltip>
+                                  }
                                   <Tooltip content="Remover">
                                     <div onClick={(e) => deleteFile(file)}>
                                       <span className="material-symbols-outlined cursor-pointer">

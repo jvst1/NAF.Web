@@ -116,7 +116,7 @@ export default function Dashboard() {
                 <div className="h-full flex flex-col justify-between w-1/4">
                   <h1>Chamado</h1>
                   <h1 className="text-gray-400">
-                    {item.id} - {item.titulo}
+                    {item.titulo}
                   </h1>
                 </div>
                 <div className="h-full flex flex-col justify-between w-1/4">
