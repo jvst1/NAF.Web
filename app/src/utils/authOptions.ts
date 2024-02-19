@@ -20,7 +20,7 @@ export const authOptions: NextAuthOptions = {
                     token: "asdasd",
                     tipoPerfil: 4
                 }
-                
+
                 var res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Auth/login`, {
                     method: 'POST',
                     body: JSON.stringify(request),
@@ -47,6 +47,9 @@ export const authOptions: NextAuthOptions = {
         })
     ],
     secret: process.env.NEXTAUTH_SECRET,
+    session: {
+        strategy: "jwt"
+    },
     pages: {
         signIn: "/"
     },
