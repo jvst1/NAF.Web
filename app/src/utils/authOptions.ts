@@ -5,6 +5,7 @@ export const authOptions: NextAuthOptions = {
     providers: [
         CredentialsProvider({
             name: "Credentials",
+            type: "credentials",
             credentials: {
                 document: { label: "Documento Federal", type: "text" },
                 password: { label: "Password", type: "password" }
@@ -15,7 +16,7 @@ export const authOptions: NextAuthOptions = {
                     password: credentials?.password
                 }
 
-                var res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Auth/login`, {
+                var res = await fetch(`https://naf.jvst.com.br/api/Auth/login`, {
                     method: 'POST',
                     body: JSON.stringify(request),
                     headers: {
